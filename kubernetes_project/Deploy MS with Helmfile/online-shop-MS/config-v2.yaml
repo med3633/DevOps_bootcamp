@@ -1,0 +1,708 @@
+## all MS of deployement and services conf will defined of each MS
+ ## deployement
+ # st MS email service
+---
+- apiVersion: apps/v1
+- kind: Deployment
+  ## name of MS
+- metadata:
+  name: emailservice
+- spec:
+  replicas: 2
+  - selector:
+    - matchLabels:
+      app: emailservice
+# pod
+  - template:
+    - metadata:
+## label of the pod to assigned to the deployement using matchLabels
+      - labels:
+        app: emailservice
+    - spec:
+      - containers:
+      # container name
+        - name: service
+        # image url
+        # fetch Docker image from Google Container Registry
+          image: gcr.io/google-samples/microservices-demo/emailservice:v0.2.3
+          - ports:
+          # MS start
+          # this could be the target port that the service forward request to the app inside the pod
+            containerPort: 8080
+            ## MS excpect var env
+            - env:
+              name: PORT
+              value: "8080"
+            - name: DISABLE_TRACING
+              value: "1"
+            - name: DISABLE_PROFILER
+              value: "1"
+            - readinessProbe:
+            # how often , how regulary the endpoint of application should be checks for his health every 5 seconds
+              periodSeconds: 5
+              # execued the following command 
+              - exec:
+                command: ["/bin/grpc_health_probe", "-addr=:8080"]
+              # have 2 parametres
+            - livenessProbe:
+            # how often , how regulary the endpoint of application should be checks for his health every 5 seconds
+              periodSeconds: 5
+              # execued the following command 
+              - exec:
+                command: ["/bin/grpc_health_probe", "-addr=:8080"]
+                # tell k8s that app is ready to recieve request
+            - resource: 
+              - requests:
+                cpu: 100m
+                memory: 64Mi
+              - limits:
+                cpu: 200m
+                memory: 128Mi
+
+---
+## services
+- apiVersion: V1
+- kind: Service
+# specification MS
+# this service email can be accesible with this name on this port 5000
+- metadata:
+  name: emailservice 
+- spec:
+  type: ClusterIP
+  - selector:
+    app: emailservice
+  - ports:
+    - protocol: TCP
+    ## service port can be the same or different from Container Port
+      port: 5000
+## service port 
+      targetPort: 8080
+
+
+## recommandationservice
+---
+- apiVersion: apps/v1
+- kind: Deployment
+  ## name of MS
+- metadata:
+  name: recommandationservice
+- spec:
+  replicas: 2
+  - selector:
+    - matchLabels:
+      app: recommandationservice
+  - template:
+    - metadata:
+      - labels:
+        app: recommandationservice
+    - spec:
+      - containers:
+        - name: service
+          image: gcr.io/google-samples/microservices-demo/recommandationservice:v0.2.3
+          - ports:
+          # MS start
+            containerPort: 8080
+            - env:
+              name: PORT
+              value: "8080"
+# Recommendation Service needs to know the endpointof ProductCatalogService (an other MS) where connect to it
+## Endpoint = service Name + Service Port 
+              name: PRODUCT_CATALOG_SERVICE_ADDR
+              # accesible using the service called and the port of service
+              value: "ProductCatalogService:3550"
+            - readinessProbe:
+            # how often , how regulary the endpoint of application should be checks for his health every 5 seconds
+              periodSeconds: 5
+              # execued the following command 
+              - exec:
+                command: ["/bin/grpc_health_probe", "-addr=:8080"]
+            - livenessProbe:
+            # how often , how regulary the endpoint of application should be checks for his health every 5 seconds
+              periodSeconds: 5
+              # execued the following command 
+              - exec:
+                command: ["/bin/grpc_health_probe", "-addr=:8080"]
+
+---
+## services
+- apiVersion: V1
+- kind: Service
+# specification MS
+- metadata:
+  name: recommandationservice 
+- spec:
+  type: ClusterIP
+  ## ref of the pod
+  - selector:
+    app: recommandationservice
+  - ports:
+    - protocol: TCP
+      port: 8080
+## service port 
+      targetPort: 8080
+
+# ProductCatalogService
+---
+- apiVersion: apps/v1
+- kind: Deployment
+  ## name of MS
+- metadata:
+  name: ProductCatalogService
+- spec:
+  replicas: 2
+  - selector:
+    - matchLabels:
+      app: ProductCatalogService
+  - template:
+    - metadata:
+      - labels:
+        app: ProductCatalogService
+    - spec:
+      - containers:
+        - name: service
+          image: gcr.io/google-samples/microservices-demo/productcatalogservice:v0.2.3
+          - ports:
+          # MS start
+            containerPort: 3550
+            - env:
+              name: PORT
+              value: "3550"
+            - readinessProbe:
+            # how often , how regulary the endpoint of application should be checks for his health every 5 seconds
+              periodSeconds: 5
+              # execued the following command 
+              - exec:
+                command: ["/bin/grpc_health_probe", "-addr=:3550"]
+            - livenessProbe:
+            # how often , how regulary the endpoint of application should be checks for his health every 5 seconds
+              periodSeconds: 5
+              # execued the following command 
+              - exec:
+                command: ["/bin/grpc_health_probe", "-addr=:3550"]
+---
+## services
+- apiVersion: V1
+- kind: Service
+# specification MS
+- metadata:
+  name: ProductCatalogService 
+- spec:
+  type: ClusterIP
+  - selector:
+    app: ProductCatalogService
+  - ports:
+    - protocol: TCP
+      port: 3550
+## service port 
+      targetPort: 3550
+
+## payment service
+---
+- apiVersion: apps/v1
+- kind: Deployment
+  ## name of MS
+- metadata:
+  name: paymentservice
+- spec:
+  replicas: 2
+  - selector:
+    - matchLabels:
+      app: paymentservice
+  - template:
+    - metadata:
+      - labels:
+        app: paymentservice
+    - spec:
+      - containers:
+        - name: service
+          image: gcr.io/google-samples/microservices-demo/paymentservice:v0.2.3
+          - ports:
+          # MS start
+            containerPort: 50051
+            - env:
+              name: PORT
+              value: "50051"
+          - readinessProbe:
+            # how often , how regulary the endpoint of application should be checks for his health every 5 seconds
+              periodSeconds: 5
+              # execued the following command 
+              - exec:
+                command: ["/bin/grpc_health_probe", "-addr=:50051"]
+              ## no talk any other service
+            - livenessProbe:
+            # how often , how regulary the endpoint of application should be checks for his health every 5 seconds
+              periodSeconds: 5
+              # execued the following command 
+              - exec:
+                command: ["/bin/grpc_health_probe", "-addr=:50051"]
+---
+## services
+- apiVersion: V1
+- kind: Service
+# specification MS
+- metadata:
+  name: paymentservice 
+- spec:
+  type: ClusterIP
+  - selector:
+    app: paymentservice
+  - ports:
+    - protocol: TCP
+      port: 50051
+## service port 
+      targetPort: 50051
+
+## currencyservice
+---
+- apiVersion: apps/v1
+- kind: Deployment
+  ## name of MS
+- metadata:
+  name: currencyservice
+- spec:
+  replicas: 2
+  - selector:
+    - matchLabels:
+      app: currencyservice
+  - template:
+    - metadata:
+      - labels:
+        app: currencyservice
+    - spec:
+      - containers:
+        - name: service
+          image: gcr.io/google-samples/microservices-demo/currencyservice:v0.2.3
+          - ports:
+          # MS start
+            containerPort: 7000
+            - env:
+              name: PORT
+              value: "7000"
+            - readinessProbe:
+            # how often , how regulary the endpoint of application should be checks for his health every 5 seconds
+              periodSeconds: 5
+              - httpGet:
+              #url heat endpont aport accesible app
+                path: /health
+                port: 3550
+            - livenessProbe:
+            # how often , how regulary the endpoint of application should be checks for his health every 5 seconds
+              periodSeconds: 5
+              # execued the following command 
+              - exec:
+                command: ["/bin/grpc_health_probe", "-addr=:7000"]
+---
+## services
+- apiVersion: V1
+- kind: Service
+# specification MS
+- metadata:
+  name: currencyservice 
+- spec:
+  type: ClusterIP
+  - selector:
+    app: currencyservice
+  - ports:
+    - protocol: TCP
+      port: 7000
+## service port 
+      targetPort: 7000
+
+# adService
+---
+- apiVersion: apps/v1
+- kind: Deployment
+  ## name of MS
+- metadata:
+  name: adService
+- spec:
+  replicas: 2
+  - selector:
+    - matchLabels:
+      app: adService
+  - template:
+    - metadata:
+      - labels:
+        app: adService
+    - spec:
+      - containers:
+        - name: service
+          image: gcr.io/google-samples/microservices-demo/adService:v0.2.3
+          - ports:
+          # MS start
+            containerPort: 9555
+            - env:
+              name: PORT
+              value: "9555"
+            - readinessProbe:
+            # how often , how regulary the endpoint of application should be checks for his health every 5 seconds
+              periodSeconds: 5
+              # execued the following command 
+              - exec:
+                command: ["/bin/grpc_health_probe", "-addr=:7000"]
+            - livenessProbe:
+            # how often , how regulary the endpoint of application should be checks for his health every 5 seconds
+              periodSeconds: 5
+              # execued the following command 
+              - exec:
+                command: ["/bin/grpc_health_probe", "-addr=:9555"]
+---
+## services
+- apiVersion: V1
+- kind: Service
+# specification MS
+- metadata:
+  name: adService 
+- spec:
+  type: ClusterIP
+  - selector:
+    app: adService
+  - ports:
+    - protocol: TCP
+      port: 9555
+## service port 
+      targetPort: 9555
+
+# cartService
+---
+- apiVersion: apps/v1
+- kind: Deployment
+  ## name of MS
+- metadata:
+  name: cartservice
+- spec:
+  replicas: 2
+  - selector:
+    - matchLabels:
+      app: cartservice
+  - template:
+    - metadata:
+      - labels:
+        app: cartservice
+    - spec:
+      - containers:
+        - name: service
+          image: gcr.io/google-samples/microservices-demo/cartservice:v0.2.3
+          - ports:
+          # MS start
+            containerPort: 7070
+            - env:
+              name: PORT
+              value: "7070"
+              ## connect with redis to storage shop card name:port because deployement in some ns // 
+              name: REDIS_ADDR
+              value: "redis-card:6379"
+              # we to prevention volume for our application , Redis persists itts data in memory
+            - readinessProbe:
+            # how often , how regulary the endpoint of application should be checks for his health every 5 seconds
+              periodSeconds: 5
+              # execued the following command 
+              - exec:
+                command: ["/bin/grpc_health_probe", "-addr=:7000"] 
+            - livenessProbe:
+            # how often , how regulary the endpoint of application should be checks for his health every 5 seconds
+              periodSeconds: 5
+              # execued the following command 
+              - exec:
+                command: ["/bin/grpc_health_probe", "-addr=:7070"]
+---
+## services
+- apiVersion: V1
+- kind: Service
+# specification MS
+- metadata:
+  name: cartservice 
+- spec:
+  type: ClusterIP
+  - selector:
+    app: cartservice
+  - ports:
+    - protocol: TCP
+      port: 7070
+## service port 
+      targetPort: 7070
+
+# redis-card
+---
+- apiVersion: apps/v1
+- kind: Deployment
+  ## name of MS
+- metadata:
+  name: redis-card
+- spec:
+  replicas: 2
+  - selector:
+    - matchLabels:
+      app: redis-card
+  - template:
+    - metadata:
+      - labels:
+        app: redis-card
+    - spec:
+      - containers:
+        - name: redis
+          image: redis:alpine
+          - ports:
+          # MS start
+            containerPort: 6379
+            - readinessProbe:
+              # wait 5 seconds before starting
+              initialDelaySeconds: 5
+            # how often , how regulary the endpoint of application should be checks for his health every 5 seconds
+              periodSeconds: 5
+              # execued the following command 
+              - tcpSocket:
+                port: 6379
+            - livenessProbe:
+              # wait 5 seconds before starting
+              initialDelaySeconds: 5
+            # how often , how regulary the endpoint of application should be checks for his health every 5 seconds
+              periodSeconds: 5
+              # execued the following command 
+              - tcpSocket:
+                port: 6379
+                          # Different Volume Types availabll : Persistent Voume Types : Exist beyond lifetime of a pod 
+              # Ephemeral Volume Types : K8s destroys volume when pod ceases to  exist 
+            # this volume mounted in container
+            - volumeMount:
+              name: redis-data
+              # the path inside container
+              mountPath: /data
+        - volumes:
+        # mount volume in pod
+          name: redis-data
+          #type of volume
+          emptyDir: {}
+
+---
+## services
+- apiVersion: V1
+- kind: Service
+# specification MS
+- metadata:
+  name: redis-card 
+- spec:
+  type: ClusterIP
+  - selector:
+    app: redis-card
+  - ports:
+    - protocol: TCP
+      port: 6379
+## service port 
+      targetPort: 6379
+
+# checkoutservice
+---
+- apiVersion: apps/v1
+- kind: Deployment
+  ## name of MS
+- metadata:
+  name: checkoutservice
+- spec:
+  replicas: 2
+  - selector:
+    - matchLabels:
+      app: checkoutservice
+  - template:
+    - metadata:
+      - labels:
+        app: checkoutservice
+    - spec:
+      - containers:
+        - name: service
+          image: gcr.io/google-samples/microservices-demo/checkoutservice:v0.2.3
+          - ports:
+          # MS start
+            containerPort: 5050
+          - env:
+            name: PORT
+            value: '5050'
+         # var env of MS that app previously expect
+            name: PRODUCT_CATALOG_SERVICE_ADDR
+            value: "productcatalogservice:3550"
+            name: SHIPPING_SERVICE_ADDR
+            value: "shippingservice:50051"
+            name: CART_SERVICE_ADDR
+            value: "cartservice:7070"
+            name: CURRENCY_SERVICE_ADDR
+            value: "currencyservice:7000"
+            name: EMAI_SERVICE_ADDR
+            value: "emailservice:50051"
+            name: PAYMENT_SERVICE_ADDR
+            value: "paymentservice:50051"
+            - readnessProbe:
+            # how often , how regulary the endpoint of application should be checks for his health every 5 seconds
+              periodSeconds: 5
+              # execued the following command 
+              - exec:
+                command: ["/bin/grpc_health_probe", "-addr=:7000"]
+            - livenessProbe:
+            # how often , how regulary the endpoint of application should be checks for his health every 5 seconds
+              periodSeconds: 5
+              # execued the following command 
+              - exec:
+                command: ["/bin/grpc_health_probe", "-addr=:5050"]
+---
+## services
+- apiVersion: V1
+- kind: Service
+# specification MS
+- metadata:
+  name: checkoutservice 
+- spec:
+  type: ClusterIP
+  - selector:
+    app: checkoutservice
+  - ports:
+    - protocol: TCP
+      port: 5050
+## service port 
+      targetPort: 5050
+
+#shippingservice
+---
+- apiVersion: apps/v1
+- kind: Deployment
+  ## name of MS
+- metadata:
+  name: shippingservice
+- spec:
+  replicas: 2
+  - selector:
+    - matchLabels:
+      app: shippingservice
+  - template:
+    - metadata:
+      - labels:
+        app: shippingservice
+    - spec:
+      - containers:
+        - name: service
+          image: gcr.io/google-samples/microservices-demo/shippingservice:v0.2.3 
+          - ports:
+          # MS start
+            containerPort: 50051
+          - env:
+            name: PORT
+            value: "50051"
+            - readnessProbe:
+            # how often , how regulary the endpoint of application should be checks for his health every 5 seconds
+              periodSeconds: 5
+              # execued the following command 
+              - exec:
+                command: ["/bin/grpc_health_probe", "-addr=:7000"]
+            - livenessProbe:
+            # how often , how regulary the endpoint of application should be checks for his health every 5 seconds
+              periodSeconds: 5
+              # execued the following command 
+              - exec:
+                command: ["/bin/grpc_health_probe", "-addr=:50051"]
+---
+## services
+- apiVersion: V1
+- kind: Service
+# specification MS
+- metadata:
+  name: shippingservice 
+- spec:
+  type: ClusterIP
+  - selector:
+    app: shippingservice
+  - ports:
+    - protocol: TCP
+      port: 50051
+## service port 
+      targetPort: 50051
+
+# frontend
+---
+- apiVersion: apps/v1
+- kind: Deployment
+  ## name of MS
+- metadata:
+  name: frontent
+- spec:
+# more than  1 replicas
+  replicas: 2
+  - selector:
+    - matchLabels:
+      app: frontent
+  - template:
+    - metadata:
+      - labels:
+        app: frontent
+    - spec:
+      - containers:
+        - name: service
+          image: gcr.io/google-samples/microservices-demo/frontend:v0.2.3
+          - ports:
+          # MS start
+            containerPort: 8080
+          - env:
+            name: PORT
+            value: "8080"
+            name: "AD_SERVICE_ADDR"
+            value: "adservice:9555"
+            name: "CHECKOUT_SERVICE_ADDR"
+            value: "checkoutservice:5050"
+            name: "CURRENCY_SERVICE_ADDR"
+            value: "currencyservice:7000"
+            name: "PRODUCT_CATALOG_SERVICE_ADDR"
+            value: "productcatalogservice:3550"
+            name: "RECOMMENDATION_SERVICE_ADDR"
+            value: "recommendationservice:8080"
+            name: "CART_SERVICE_ADDR"
+            value: "cartservice:7070"
+            - readnessProbe:
+            # how often , how regulary the endpoint of application should be checks for his health every 5 seconds
+              periodSeconds: 5
+              # execued the following command 
+              - exec:
+                command: ["/bin/grpc_health_probe", "-addr=:7000"]
+            - readnessProbe:
+            # how often , how regulary the endpoint of application should be checks for his health every 5 seconds
+              periodSeconds: 5
+              # execued the following command 
+              - exec:
+                command: ["/bin/grpc_health_probe", "-addr=:7000"]
+            - livenessProbe:
+            # how often , how regulary the endpoint of application should be checks for his health every 5 seconds
+              periodSeconds: 5
+              # execued the following command 
+              - exec:
+                command: ["/bin/grpc_health_probe", "-addr=:8080"]
+---
+## services
+- apiVersion: V1
+- kind: Service
+# specification MS
+- metadata:
+  name: frontent 
+- spec:
+# give more security than nodeport
+  type: LoadBalancer
+  # type: NodePort
+  - selector:
+    app: frontent
+  - ports:
+    - protocol: TCP
+    #http
+      port: 80
+## service port 
+      targetPort: 8080
+      # accesible on the browser on port 30007 that open on all worker node
+      # and we can remove when use loadbalancer
+      # nodePort: 30007
+# => ClusterIP is an internal Service 
+# ==>  frontend needs external access = NodePort
+# => deploy that configuration into namespaces microservices.
+# kubectl create ns microservices 
+# kubectl apply -f config.yaml -n microservices
+# show pod in that namespaces
+# kubectl get pod -n microservices
+# check our services in that microservices
+# kubectl get svc -n microservices
+# u can watch the creation ps of the pod 
+# kubectl get pod -w
+# there are alternatives of exec command is TCP probes => makes probe connection at the node, not in the pod 
+  

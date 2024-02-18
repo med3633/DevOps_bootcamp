@@ -1,0 +1,31 @@
+---
+- name: Deploy app in new ns
+  hosts: loalhost
+  tasks:
+  - name: Create a k8s ns
+    - k8s: 
+    #name of the namespace
+      name: myapp
+      #some att use in k8s 
+      api_version: v1
+      kind: Namespace
+      # inside the cluster
+      state: present
+      # which cluster to connect to and credentials ; to use this module there are 3 thing -python >=2.7 -openshift >=0.6 -PyYAML >=3.11 in the target machine to check openshift module in pythn with command line => python3 -c "import openshift" if not install i type pip3 instal openshift add option --user that install in home directory with any privillege
+      kubeconfig: ../kubeconfig_myapp-eks-cluster
+  - name: Deploy nginx app
+  #the location of nginx file
+    - k8s: 
+      src: ~/Demo-project/Simple-k8s-files/nginx-config.yml
+      state: present
+      # k8s khnow were execute this tasks
+      kubeconfig: ../kubeconfig_myapp-eks-cluster
+      #add ns
+      namespace: myapp
+
+ 
+# to excute playbook => ansible-playbook deploy_k8s.yml
+
+# to check ns was created in CLI => export KUBECONFIG=../kubeconfig_myapp-eks-cluster ; kubectl get ns
+# to check pod created in that ns => kubectl get pod -n myapp
+# put kubeconfig for every use => export K8S_AUTH_KUBECONFIG=../kubeconfig_myapp-eks-cluster that u can delete kubeconfig:

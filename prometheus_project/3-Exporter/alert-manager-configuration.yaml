@@ -1,0 +1,36 @@
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: AlertmangerConfig
+metadata:
+  name: main-rules-alert-confnig
+  namespace: monitoring
+spec:
+# conf what we want to send to the email
+  route:
+    receiver: 'email'
+    # if the issue not resolve we gonna send after 30m
+    repeatInterval: 30m
+    routes:
+    - matchers:
+      - name: alertname
+        value: HostHighCpuLoad
+    - matchers:
+      - name: alertname
+        value: kubernetesPodCrashLooping
+      # send rule important that's why send every 10 m
+      repeatInterval: 10m
+  receivers:
+  - name: 'email'
+    emailConfigs:
+    - to: 'blibechmedamine@gmail.com'
+      from: 'blibechmedamine@gmail.com'
+      smarthost: 'smtp.gmail.com:587'
+      authUsername: 'blibechmedamine@gmail.com'
+      authIdentity: 'blibechmedamine@gmail.com'
+      authPassword:
+        name: gmail-auth
+        key: password
+
+
+# apply secret first then aplly alert-manager-configuration
+# to check => kubectl get alertmanagerconfig -n monitoring
+# to chech logs => kubectl get pod -n monitoring => kubectl logs alertmanager-monitoring-kube-prometheus-alertmanager-0 -n monitoring -c <name of container>

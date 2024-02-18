@@ -1,0 +1,71 @@
+---
+- name: Install node && npm
+  hosts: webserver
+  tasks:
+    - name: Update apt repo and cache
+      apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+    - name: Install node && npm
+      - apt:
+        - pkg:
+          nodejs
+          npm
+
+- name: Create new linux user
+  hosts: webserver
+  become: True
+  become_user: amine
+  tasks:
+    - name: Create user
+      - user:
+        name: amine
+        comment: amine Admin
+        group: admin
+
+- name: Deploy nodejs app
+  hosts: webserver
+  tasks:
+  # 1st methode 
+  - name: Copy nodejs folder a server
+    # copy in local to remote machine
+    - copy:
+    # the file in my local machine
+      src: ~/Desktop/app/nodejs-app-1.0.0.tgz
+      # the file in remote machine with different name of file
+      dest: /home/amine/app-1.0.0.tgz
+  - name: Unpack the nodejs file
+    - unarchive: 
+      #src on the remote
+      src: /home/amine/app-1.0.0.tgz
+      # location will be unarchive on the remote
+      des: /home/amine
+      remote_src: yes
+      # 2st methode able to put only unpack tasks
+  - name: Unpack the nodejs file
+    - unarchive: 
+      #src on the local
+      src: ~/Desktop/app/nodejs-app-1.0.0.tgz
+      # location will be unarchive on the remote
+      des: /home/amine
+  - name: Install Dependencies
+    - npm:
+      path: /home/aminepackage
+  - name: Start the application
+    #command: node /root/package/app/server
+    - command:
+      chdir: /home/amine/package/app
+      cmd: node server
+     # make run in background
+    async: 1000
+    poll: 0
+  - name: Ensure app is running
+  # shell is the some of command but shell is much open in shell injection and excute pipe "|" redirects ">", "<" boolean "&&","||" and env-var such as $HOME however command is more secure"
+    shell: ps aux | grep node
+    # return values of modules => Ansible modules normally return data , this data can be registered into a variable
+    register: shell_result
+    # print result
+  - debug: msg={{shell_resule.stdout_lines}}
+  #nb: In python we need to check the status ; Ansible and Terraform handles that state check for us; Ansible easier to write , because it's just YAML 
+
+
+      
+

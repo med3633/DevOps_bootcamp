@@ -1,0 +1,37 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: main-rule
+  namespace: monitoring
+  labels:
+    app: kube-prometheus-stack
+    release: monitoring
+spec:
+  groups:
+  - name: main.rules
+    rules:
+    - alert: HostHighCpuLoad
+      expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{node="idle"}[2m])))
+      for: 2m
+      labels:
+        severity: warning
+        namespace: monitoring
+      annotations:
+        description: "CPU load on host is over 50%\n Value = {{ $value }}\n Instance"
+        summary: "Host CPU load high"
+    - alert: kubernetesPodCrashLooping
+      expr: kube_pod_container_status_restarts_total > 5
+      for: 0m
+      labels:
+        severity: critical
+        namespace: monitoring
+      annotations:
+
+# without create prometheus rule we can install our chart 
+# helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+# helm repo update
+#helm install [RELEASE_NAME] prometheus-community/prometheus-redis-exporter -f <file that created>
+# list helm charts that created
+#helm ls 
+# to see servicemonitoring => kubectl get servicemonitor
+# to show the output of yaml of servicemonitor => kubectl get servicemonitor <............> -o yaml | less

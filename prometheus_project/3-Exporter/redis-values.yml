@@ -1,0 +1,10 @@
+serviceMonitor:
+  # When set true then use a ServiceMonitor to configure scraping
+  enabled: true
+  labels:
+     release: monitoring
+  # to show monitoring stack in namespace monitoring => kubectl get servicemonitor -n monitoring , t see one of them => kubectl get servicemonitor -n monitoring <.....> -o yaml | less
+# to show redis service name => kubectl get svc | grep redis 
+
+redisAddress: redis://redis-cart:6379
+

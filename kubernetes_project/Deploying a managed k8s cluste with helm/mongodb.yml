@@ -1,0 +1,9 @@
+architecture: replicaset
+replicaCount: 3
+persistence:
+## 1.connect to linode
+## 2.create phy storage for each pod 
+## 3.attach to your Pods
+    storageClass: 'linode-block-storage'
+auth:
+    rootPassword: secret-root-pwd

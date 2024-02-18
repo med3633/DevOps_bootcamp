@@ -1,0 +1,56 @@
+- api: app/v1
+- kind: Deployement
+- metadata:
+  name: mongo-express
+  - labels:
+    app: mongo-express
+- spec:
+  replicas: 1
+  - selector:
+    - matchLabels:
+      app: mongo-express
+  - template:
+    - metadata: 
+      - labels:
+        app: mongo-express
+    - spec:
+      - containers:
+        - name: mongo-express
+          image: mongo-express
+          - ports:
+            containerPort: 8081
+          - env:
+          # conf for connect to mongodb => check mogo express in docker hub
+            name: ME_CONFIG_MONGODB_ADMINUSERNAME
+            - valueForm: 
+              name: mongodb-secret
+              key: username
+            name: ME_CONFIG_MONGODB_ADMINPASSWORD
+            - valueForm:
+              - secretkeyRef: 
+                name: mongodb-secret
+                key: password
+            name: ME_CONFIG_MONGODB_SERVER
+            - valueForm:
+              - secretkeyRef: 
+                name: mongodb-configmap
+                key: db_host
+# Deployment/Pod can refrences these key/value pairs
+---
+- apiiVersion: v1
+- kind: Service
+- metadata:
+  name: mongo-express-service
+- spec:
+  - selector:
+    app: mongo-express
+  - ports:
+    - protocol: TCP
+      port: 8081
+      # send req to pod
+      targetPort: 8081
+
+
+      
+
+

@@ -1,0 +1,9 @@
+helm uninstall chartRealise
+helm uninstall chartRealise
+helm uninstall chartRealise
+helm uninstall chartRealise
+helm uninstall chartRealise
+helm uninstall chartRealise
+helm uninstall chartRealise
+helm uninstall chartRealise
+helm uninstall chartRealise

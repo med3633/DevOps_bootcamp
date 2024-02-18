@@ -1,0 +1,20 @@
+- apiVersion: extensions/v1beta1
+- kind: Ingress
+- metadata:
+  - annotation:
+    kubernetes.io/ingess.class: nginx
+  name: mongo-express
+- spec:
+  - rules:
+  ## domain addres that connect to your cluster=> host name of nodeBalancer
+  ## your application domain, e.g. my-app.com
+  ## the domain must point to IP address of NodeBalancer
+    - host: XXX
+    # forward req comming with this domain
+      - http:
+        - path: /
+          - backend:
+          # to service name
+            serviceName: mongo-express-service
+            servicePort: 8081
+      

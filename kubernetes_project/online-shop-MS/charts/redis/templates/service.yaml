@@ -1,0 +1,15 @@
+## services
+- apiVersion: V1
+- kind: Service
+# specification MS
+- metadata:
+  name: {{.Values.appName }} 
+- spec:
+  type: ClusterIP
+  - selector:
+    app: {{.Values.appName }}
+  - ports:
+    - protocol: TCP
+      port: {{.Values.servicePort}}
+## service port 
+      targetPort: {{.Values.containerPort}}

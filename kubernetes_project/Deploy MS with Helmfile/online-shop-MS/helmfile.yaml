@@ -1,0 +1,37 @@
+# define the list of the all realises
+# rediscart
+- realeases:
+  - name: rediscart
+    # path of chart
+    chart: charts/redis
+    - values:
+      values/redis-values.yaml 
+      #--set
+      appReplicas: "1"
+      volumeName: "redis-cart-data"
+
+# cartservice
+- realeases:
+  - name: cartservice
+    # path of chart
+    chart: charts/microservice
+    - values:
+      values/cartservices-service-values.yaml 
+
+# adServices
+- realeases:
+  - name: adservices
+    # path of chart
+    chart: charts/microservices
+    - values:
+      values/adServices-service-values.yaml 
+
+# emailservice
+- realeases:
+  - name: rediscart
+    # path of chart
+    chart: charts/microservices
+    #-f
+    - values:
+      values/email-service-values.yaml 
+

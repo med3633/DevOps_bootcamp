@@ -1,0 +1,49 @@
+- apiVersion: apps/v1
+- kind: Deployment
+  ## name of MS
+- metadata:
+  name: {{.Values.appName }}
+- spec:
+  replicas: {{ .Values.appReplicas }}
+  - selector:
+    - matchLabels:
+      app: {{.Values.appName }}
+  - template:
+    - metadata:
+      - labels:
+        app: {{.Values.appName }}
+    - spec:
+      - containers:
+        - name: {{.Values.appName }}
+          image: "{{ .Values.appImage }}":"{{ .Values.appVersion }}"
+          - ports:
+          # MS start
+            containerPort: {{.Values.containerPort}}
+            - readinessProbe:
+              # wait 5 seconds before starting
+              initialDelaySeconds: 5
+            # how often , how regulary the endpoint of application should be checks for his health every 5 seconds
+              periodSeconds: 5
+              # execued the following command 
+              - tcpSocket:
+                port: {{.Values.containerPort}}
+            - livenessProbe:
+              # wait 5 seconds before starting
+              initialDelaySeconds: 5
+            # how often , how regulary the endpoint of application should be checks for his health every 5 seconds
+              periodSeconds: 5
+              # execued the following command 
+              - tcpSocket:
+                port: {{.Values.containerPort}}
+                          # Different Volume Types availabll : Persistent Voume Types : Exist beyond lifetime of a pod 
+              # Ephemeral Volume Types : K8s destroys volume when pod ceases to  exist 
+            # this volume mounted in container
+            - volumeMount:
+              name: {{ .Values.volumeName}}
+              # the path inside container
+              mountPath: {{ .Values.ContainerMountPath}}
+        - volumes:
+        # mount volume in pod
+          name: {{ .Values.volumeName}}
+          #type of volume
+          emptyDir: {}

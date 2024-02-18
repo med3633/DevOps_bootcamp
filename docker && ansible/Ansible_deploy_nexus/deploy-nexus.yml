@@ -1,0 +1,155 @@
+---
+- name: Install javaa for nexus t run and net tools
+  host: 134.122.73.78
+  tasks:
+    - name: Update apt repo and cache
+      apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+    - name: Install Java for nexus t run and net tools 
+      apt: name=openjdk-8-jre-headless
+    - name: Install net tools
+      apt: name=net-tools
+
+- name: Downloald and unpack nexus installer
+  hosts: 134.122.73.78
+  tasks:
+  - name: Download Nexus
+    - get_url:
+      url: https://download.sonatype.com/nexus/3/latest-unix.tar.gz
+      dest: /opt/
+      #register the result of the download
+    - register: download_result
+    # print the result of downloading
+  - debug: msg={{download_result}}
+ - name: Untck nexus installer
+   - unarchive:
+   # in src put the location of .gz
+    # src: /opt/nexus-3.30.0-01-unix.tar.gz
+     src: "{{download_result.dest}}"
+     # unpack in the same location
+     dest: /opt/
+     # some conf be the some in the remote machine
+     remote_src: yes
+   - when: not stat_result.stat.exists
+     #rename the output of the downloading 
+ - name: Find nexus folder
+ # find anything we started with nexus-*
+   - find: 
+     paths: /opt
+     #a regular expression to match 
+     pattern: "nexus-*"
+     # search for directory not for file
+     file_type: directory
+   register: find_result
+ - debug: msg={{find_result}}
+   
+
+ # "find" module return a list of files based of specific criteria
+ # for Windows targets:"win_find" module
+ #shell excute on everytime u reloadserv => bad thing => so u excute shell for the first load and for the other load not execute
+ # Excute task depending on some condition
+ - name: Check if nexus folder already exists
+   - stat:
+     path: /opt/nexus
+   - register: stat_result
+ - debug: msg={{stat_result.stat.exists}}
+
+ - name: Rename nexus folder
+   shell: mv {{find_result.files[0].path}} /opt/nexus
+   when: not stat_result.stat.exists
+   # 1.create nexus grp
+   # 2.create nexus user
+   # 3.=> assign user to that grp
+- name: Create nexus user to own nexus folders
+  hosts: 134.122.73.78
+  tasks:
+    - name: Ensure nexus grp exists
+    # group Module => manage presence of groups on a host , for windows targets:"win_group" module
+      - group:
+        name: nexus
+        state: present
+    - name: Create nexus user.
+     - user:
+       name: nexus
+       group: nexus
+    - name: Make nexus user owner of nexus folder
+    # "file" module Manage files and fie properties , For Windows target:"win_file" module
+     - file:
+     #wich folder or file are u conf
+       path: /opt/nexus
+       #this is directory
+       state: directtory
+       owner: nexus
+       group: nexus
+       recurse: yes
+
+    - name: Make nexus user owner of sonartype-work folder
+    # "file" module Manage files and fie properties , For Windows target:"win_file" module
+     - file:
+     #wich folder or file are u conf
+       path: /opt/sonartype-work
+       #this is directory
+       state: directtory
+       owner: nexus
+       group: nexus
+       recurse: yes
+
+    
+- name: Start nexus with nexus user
+  hosts: 134.122.73.78
+  tasks:
+  #change user nexus
+  become: True
+  become_user: nexus
+   - name: Set run_as_user nexus
+   # "blockinfile" module => insert, update, remove a multi-line text surrounded by customizable marker line.
+    - blockinfile: 
+    #locatin of file
+      path: /opt/nexus/bin/nexus.rc
+      #block in file line by ine 
+      block: |
+        run_as_user="nexus"
+    # "lineinfile" module ensure a particular line is in a file, or replace an existing line using regex , useful when you want to change a single ine in a file only
+    - lineinfile: 
+      path: /opt/nexus/bin/nexus.rc
+      #replace this line by the line with the attribut line
+      regexp: '^#run_as_user=""'
+      line: run_as_user="nexus"
+    - name: Start nexus
+    # run instead of start to sea the log 
+      command: /opt/nexus/bin/nexus start
+
+- name: verify nexus running
+  hosts: 134.122.73.78
+  tasks:
+   - name: Check with ps
+     shell: ps aux | grep nexus
+     register: app_status
+   - debug: msg={{app_status.stdout.lines}}
+   - name: Wait one minute
+    - pause:
+      minutes: 1
+   - name: Check with netstat
+     shell: netstat -plnt
+     register: app_status 
+   - debug: msg={{app_status.stdout_lines}}
+
+
+
+
+         
+
+
+      
+        
+   
+
+
+  
+
+
+
+
+     
+
+
+# execute this plybook => ansible-playbook -i hosts deploy-nexus

@@ -1,0 +1,24 @@
+import boto3
+
+client = boto3.client('eks', region_name="eu-west-3")
+
+#list of clusters by name
+clusters = client.list_clusters()['clusters']
+print(clusters['clusters'])
+#boucle the cluster
+for cluster in clusters:
+    res = client.describe_cluster(
+        name= cluster
+    )
+
+    #check the status of the cluster
+    cluster_status = res["cluster"]["status"]
+    print(f"Cluster {cluster} status is {cluster_status} ")
+    #show the endpoint of the cluster
+    cluster_endpoint = res["cluster"]["endpoint"]
+    print(f"Cluster endpoint of {cluster}  is {cluster_endpoint} ")
+    #show the version of my cluster
+    cluster_version = res["cluster"]["version"]
+    print(f"Cluster version of {cluster}  is {cluster_version} ")
+
+

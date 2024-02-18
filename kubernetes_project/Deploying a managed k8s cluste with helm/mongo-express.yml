@@ -1,0 +1,54 @@
+- api: app/v1
+- kind: Deployement
+- metadata:
+  name: mongo-express
+  - labels:
+    app: mongo-express
+- spec:
+  replicas: 1
+  - selector:
+    - matchLabels:
+      app: mongo-express
+  - template:
+    - metadata: 
+      - labels:
+        app: mongo-express
+    - spec:
+      - containers:
+        - name: mongo-express
+          image: mongo-express
+          - ports:
+            containerPort: 8081
+          - env:
+          # conf for connect to mongodb => check mogo express in docker hub
+            name: ME_CONFIG_MONGODB_ADMINUSERNAME
+            value: root
+            name: ME_CONFIH_MONGODB_SERVER
+            # this endpoint mongo-express connect to mongodb
+            # pod.srvname
+            value: mongodb-0.mongodb-headless
+            # get pwd from secret component
+            # u can check with command=> kubectl get secret mongodb -o yaml
+            - name: ME_CONFIG_MONGODB_ADMINPASSWORD
+              - valueFrom:
+                - secretkeyRef:
+                  name: mongodb
+                  key: mongodb-root-password
+---
+- apiiVersion: v1
+- kind: Service
+- metadata:
+  name: mongo-express-service
+- spec:
+  - selector:
+    app: mongo-express
+  - ports:
+    - protocol: TCP
+      port: 8081
+      # send req to pod
+      targetPort: 8081
+
+
+      
+
+

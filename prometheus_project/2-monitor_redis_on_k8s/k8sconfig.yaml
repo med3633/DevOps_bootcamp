@@ -1,0 +1,67 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nodeapp
+  labels:
+    app: nodeapp
+spec:
+  selector:
+    matchLabels:
+      app: nodeapp
+  template:
+    metadata:
+      labels:
+        app: nodeapp
+    spec:
+    # use that secret to fetch image
+      imagePullSecrets:
+      - name: <name of secret>
+      containers:
+      - name: nodeapp
+      # private repo we need to create secret to all k8s fetch thhat image type docker info
+      # kubectl create secret <type of sect =>docker-registry> <name of secret> --docker-server=https://index.docker.io/v1/ --docker-username=nanajanashia --docker-password=<pwd>
+        image: nanajanashia/demo-app:nodeapp
+        ports:
+        - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nodeapp
+  labels:
+    app: nodeapp
+spec:
+  type: ClusterIP
+  selector:
+    app: nodeapp
+  ports:
+  #name of port that
+  - name: service
+    protocol: TCP
+    port: 3000
+    targetPort: 3000
+---
+#(service monitor)
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+   name: monitoring-node-app
+   labels:
+     release: monitoring 
+     app: nodeapp
+spec:
+   endpoints:
+   - path: /metrics
+   # port that name service port is accesible
+     port: service
+     targetPort: 3000
+   namespaceSelector:
+#     any: true
+#or 
+     matchNames:
+     - default
+   selector:
+     matchLabels:
+       app: nodeapp
+

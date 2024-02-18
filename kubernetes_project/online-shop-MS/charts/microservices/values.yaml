@@ -1,0 +1,21 @@
+# defaut value file for deployment template
+appName: servicename
+appImage: gcr.io/google-samples/microservices-demo/servicename
+appVersion: v.0.0.0
+appReplicas: 1
+containerPort: 8080
+# list that we difined with range
+containerEnvVars:
+# change key , value to name and value to directly copy value from our config file
+- name: ENV_VAR_ONE
+  value: "valueone"
+- name: ENV_VAR_TWO 
+  value: "valuetwo"
+
+#nb: refernce for all
+
+# defaut value file for service template
+servicePort: 8080
+serviceType: clusterIP
+
+# And create values file for every MS outside the chart

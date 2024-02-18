@@ -1,0 +1,30 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: redis-rule
+  labels:
+    app: kube-prometheus-stack
+    release: monitoring
+spec:
+  groups:
+  - name: redis.rules
+    rules:
+    - alert: RedisDown
+      expr: redis_up == 0
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: Redis down (instance {{ $labels.instance }})
+        description: "Redis instance is down\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+    - alert: RedisTooManyConnections
+      expr: redis_connected_clients / redis_config_maxclients * 100 > 90
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: Redis too many connections (instance {{ $labels.instance }})
+        description: "Redis instance has {{ $value }} connections \n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+        
+# kubectl apply -f redis-rules
+# to check if down i enter deployment => kubectl edit deployment redis-cart and set replicas to zero 

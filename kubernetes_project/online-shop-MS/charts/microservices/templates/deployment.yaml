@@ -1,0 +1,36 @@
+# the basic deployment file 
+---
+- apiVersion: apps/v1
+- kind: Deployment
+  ## name of MS
+- metadata:
+  name: {{.Values.appName}}
+- spec:
+  replicas: {{.Values.appReplicas}}
+  - selector:
+    - matchLabels:
+      app: {{.Values.appName}}
+# pod
+  - template:
+    - metadata:
+## label of the pod to assigned to the deployement using matchLabels
+      - labels:
+        app: {{.Values.appName}}
+    - spec:
+      - containers:
+      # container name
+        - name: {{.Values.appName}}
+        # image url
+        # fetch Docker image from Google Container Registry
+        # define two variables 
+          image: "{{.Values.appImage}}:{{.Values.appVersion}}"
+          - ports:
+          # MS start
+          # this could be the target port that the service forward request to the app inside the pod
+            containerPort: {{.Values.containerPort}}
+            ## MS excpect var env make dynamique because every MS define  env var i  use range fct take list ; value inter always as string "8080" that's why i use pippe; and close the loop by {{-end}}
+            - env:
+            {{- range .Values.containerEnvVar}}
+              name: {{.key}}
+              value: {{.value | quote}}
+            {{- end}}

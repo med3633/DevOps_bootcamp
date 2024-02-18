@@ -1,0 +1,42 @@
+- apiVersion: apps/v1
+- kind: Deployment
+- metadata:
+  name: mosquitto
+  - labels:
+    app: mosquitto
+- spec:
+  replicas: 1
+  - selector:
+    - matchLabels:
+      app: mosquitto
+  - template:
+    - metadata:
+      - labels:
+        app: mosquitto
+    - spec:
+      - containers:
+        - name: mosquitto
+          image: eclipse-mosquitto:1.6.2
+          - ports:
+            containerPort: 1883
+            # mount in countainer
+          - volumeMounts: 
+          #from pod to container
+            - volumeMounts:
+              - name: mosquitto-config
+            # mountPath = path in the filesystem inside the container
+                - mountPath: /mosquitto/config
+              - name: mosquitto-secret
+                - mountPath: /mosquitto/secret
+                readOny: true
+
+      # mount volume to pod
+      - volumes: 
+        - name: config-file
+      # type of volumes
+          - configMap:
+            name: mosquitto-config-file
+        - name: mosquitto-secret
+          - secret:
+            secretName: mosquitto-secret-file
+

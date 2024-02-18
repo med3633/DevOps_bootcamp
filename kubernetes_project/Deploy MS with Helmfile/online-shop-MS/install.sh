@@ -1,0 +1,11 @@
+helm install -f values/nameservice-services-values.yaml --set appReplicas=1 nameservices charts/microservices
+helm install -f values/nameservice-services-values.yaml --set appReplicas=1 nameservices charts/microservices
+helm install -f values/nameservice-services-values.yaml --set appReplicas=1 releasenames charts/microservices
+helm install -f values/nameservice-services-values.yaml --set appReplicas=1 releasenames charts/microservices
+helm install -f values/nameservice-services-values.yaml --set appReplicas=1 releasenames charts/microservices
+helm install -f values/nameservice-services-values.yaml --set appReplicas=1 releasenames charts/microservices
+helm install -f values/nameservice-services-values.yaml --set appReplicas=1 releasenames charts/microservices
+helm install -f values/nameservice-services-values.yaml --set appReplicas=1 releasenames charts/microservices
+helm install -f values/nameservice-services-values.yaml --set appReplicas=1 releasenames charts/microservices
+helm install -f values/nameservice-services-values.yaml --set appReplicas=1 releasenames charts/microservices
+helm install -f values/nameservice-services-values.yaml --set appReplicas=1 releasenames charts/microservices

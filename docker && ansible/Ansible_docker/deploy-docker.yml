@@ -1,0 +1,130 @@
+---
+# name of the play 
+# check accesible instance 
+- name: Wait for ssh connection
+  hosts: all
+  # not use ansible intrepreter
+  grather_facts: False
+  tasks:
+    - name: ensure ssh port open
+      #let's us tell ansible to wait 10 s to be true to do tasks.
+      - wait_for:
+        port: 22
+        delay: 10
+        timout: 100
+        # continue open ssh
+        search_regix: OpenSSH
+        # if u don't khnow ip adresse before bec ause is dynamic.
+        host: '{{ (ansible_ssh_host|default(ansible_host))|default(ansible_host)|default(inventory_hostname) }}'
+        # u want to exeute this tasks locally
+      - vars:
+        ansible_connection: local
+        ansible_python_interpreter: /usr/bin/python
+
+
+# install python3 with the difault intreprepter python2
+- name: Install python3
+  hosts: docker_server
+  become: yes
+  tasks:
+  # name of the tasks
+    - name: Install python3
+    # we can intrepreter python2 to install python3 in the target node and the rest of tasks could be executed by python3
+      vars:
+        ansible_python_interpreter: /usr/bin/python
+      yum:
+        name: python3
+        update_cache: yes
+        state: present
+
+- name: Install Docker
+  hosts: docker_server
+  # we need to be root user to performe command
+  become: yes
+  # wich user would be switch on this specified play 
+  become_user: root
+  tasks: 
+   - name: Install Docker
+     yum:
+       name: docker
+       update_cache: yes
+       # if want to install package
+       state: present
+       # if want to uninstall package
+       state: absent
+       # to execute ansible-playbook deploy-docker.yml
+       # on target node il faut paython 3 intrepreter
+
+- name: Install python3 and docker
+  hosts: docker_server
+  become: yes
+  tasks:
+  # name of the tasks
+    - name: Install python3 and docker
+    # we can intrepreter python2 to install python3 in the target node and the rest of tasks could be executed by python3
+      vars:
+        ansible_python_interpreter: /usr/bin/python
+      yum:
+        name: 
+          - python3
+          - docker
+        update_cache: yes
+        state: present
+- name: Install Docker-compose
+  hosts: docker_server
+  become: yes
+  tasks:
+    - name: Install Docker-compose
+      - get_url:
+      # lookup plugins are an Ansible-specific extension to the jinja2 templating language=> allow ansible to access data from outside sources
+      #" pipe" is an ansible lookup plugin ,it calculates the output of the shell command and pipes it to the left side of your lookup
+        url: https://github.com/docker/compose/releases/download/1.27.4/docker-comppse-Linux-{{lookup('pipe', 'uname -m')}}
+        # location of installation
+        dest: /var/local/bin/docker-compose
+        # change permission of the location of installation
+        mode: +x 
+
+- name: Start docker
+  hosts: docker_server
+  become: yes
+  tasks: 
+    - name: Start Docker
+    # systemd Module controls systemd services on remote hosts
+      - systemd:
+      # the service
+        name: docker
+        state: started
+
+- name: add ec2-user to docker group
+  hosts: docker_server
+  become: yes
+  tasks: 
+    - name: add ec2-user to docker group
+    # user Module allow u to create new user or add existing user to the group
+      - user:
+      # name of user
+        name: ec2_user
+        # add docker docker on list of grp
+        groups: docker 
+        # docker grp will be append to this list of groups  
+        append: yes  
+        # usermod -aG docker user => u add user to docker grp but docker not show in groups list => only add an existing user and take effect to add docker to groups list only when re-connect
+    - name: Reconnect to server session
+      meta: reset_coonnection
+
+- name: Create new linux user
+# because public ip is dynamic
+  hosts: all
+  become: yes
+  tasks:
+    - name: Create  new linux user
+      - user:
+        name: med
+        groups: docker
+
+- name: test docker pull
+  hosts: docker_server
+  tasks:
+   - name: Pull redis
+     command: docker pull redis
+        

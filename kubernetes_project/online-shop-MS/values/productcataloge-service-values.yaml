@@ -1,0 +1,16 @@
+appName: productcatalogservice
+appImage: gcr.io/google-samples/microservices-demo/productcatalogservice
+appVersion: v.0.2.3
+appReplicas: 2
+containerPort: 3550
+# list that we difined with range
+containerEnvVars:
+# change key , value to name and value to directly copy value from our config file
+- name: PORT
+  value: "3550"
+
+
+
+servicePort: 3550
+# we can delete this because the defaut service type is clusterIP
+#serviceType: clusterIP

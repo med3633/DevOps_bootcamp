@@ -1,0 +1,18 @@
+- apiVersion: networking.k8s.io/v1
+- kind: Ingress
+- metadata:
+  name: myapp-ingress
+- spec:
+# routing rules
+  - rules:
+    - host: myapp.com
+    # incoming Req gets forwarted to internal srv
+      - http:
+      # the urll path
+        - paths:
+          - backend:
+          # forward request to the internal service
+            serviceName: myapp-internal-service
+            # internal srv port
+            servicePort: 8080
+  

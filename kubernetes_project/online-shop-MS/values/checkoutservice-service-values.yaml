@@ -1,0 +1,31 @@
+appName: checkoutservice
+appImage: gcr.io/google-samples/microservices-demo/checkoutservice
+appVersion: v.0.2.3
+appReplicas: 2
+containerPort: 5050
+# list that we difined with range
+containerEnvVars:
+# change key , value to name and value to directly copy value from our config file
+- name: PORT
+  value: "5050"
+- name: PRODUCT_CATALOG_SERVICE_ADDR
+  value: "productcatalogservice:3550"
+- name: SHIPPING_SERVICE_ADDR
+  value: "shippingservice:50051"
+- name: CART_SERVICE_ADDR
+  value: "cartservice:7070"
+- name: CURRENCY_SERVICE_ADDR
+  value: "currencyservice:7000"
+- name: EMAI_SERVICE_ADDR
+  value: "emailservice:50051"
+- name: PAYMENT_SERVICE_ADDR
+  value: "paymentservice:50051"
+- name: DISABLE_TRACING
+  value: "1"
+- name: DISABLE_PROFILER
+  value: "1"
+
+
+servicePort: 5050
+# we can delete this because the defaut service type is clusterIP
+#serviceType: clusterIP

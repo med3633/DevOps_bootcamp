@@ -1,0 +1,46 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: main-rule
+  namespace: monitoring
+  labels:
+    app: kube-prometheus-stack
+    release: monitoring
+spec:
+  groups:
+  - name: main.rules
+    rules:
+    # cpustress simulate cpu in docker container we can find in dockerhub
+    # kubectl run cpu-test --image=containerstack/cpustress -- --cpu 4 --timeout 30s --metrics-brief
+    - alert: HostHighCpuLoad
+      expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[2m])) * 100) > 50
+      for: 2m
+      labels:
+        severity: warning
+        namespace: monitoring
+      annotations:
+        description: "CPU load on host is over 50%\n Value = {{ $value }}\n for Instance = {{ $labels.instance }}\n"
+        summary: "Host CPU load high"
+    - alert: kubernetesPodCrashLooping
+      expr: kube_pod_container_status_restarts_total > 5
+      for: 0m
+      labels:
+        severity: critical
+        namespace: monitoring
+      annotations:
+        description: "Pod{{ $labels.pod }}is crash looping\n Value = {{ $value }}"
+        summary: "K8s pod crash looping"
+
+
+
+
+
+# name: HostHighCpuLoad
+# expr: 
+# for: 10m
+# labels:
+#   severity: warning
+#   namespace: monitoring 
+# annotations:
+#   description: 
+#   summary: "Host CPU load high"
