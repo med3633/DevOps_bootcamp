@@ -1,0 +1,633 @@
+Let us continue to improve our LAMP stack E-Commerce application. Now that we have learned to develop playbooks and various modules, let's further develop our playbooks to install packages and configure applications.
+
+
+Let us start with the first step of installing common dependencies on both the servers. We need the following packages installed on both web and db servers.
+
+libselinux-python
+
+libsemanage-python
+
+firewalld.
+
+Playbook: ~/playbooks/lamp-stack-playbooks/deploy-lamp-stack.yml
+
+---
+- name: Deploy LAMP
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install common dependencies
+      yum:
+        name:
+          - libselinux-python
+          - libsemanage-python
+          - firewalld
+        state: present
+
+Let us now configure MariaDB Service on the lamp-db server. Update the playbook to add a play to perform the following tasks on lamp-db
+
+
+1. Install the following packages:
+mariadb-server
+
+MySQL-python
+
+2. Copy the MySQL Configuration file
+located at files/my.cnf to /etc/my.cnf
+
+3. Start and enable the mariadb Service
+4. Start and enable the firewalld Service
+5. Insert firewalld rule
+Allow mysql_port - 3306/tcp
+zone - public
+
+Playbook: ~/playbooks/lamp-stack-playbooks/deploy-lamp-stack.yml
+
+
+---
+- name: Deploy LAMP
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install common dependencies
+      yum:
+        name:
+          - libselinux-python
+          - libsemanage-python
+          - firewalld
+        state: present
+
+- name: Configure MariaDB on lamp-db
+  hosts: lamp-db
+  become: yes
+  tasks:
+    - name: Install MariaDB and MySQL-python packages
+      yum:
+        name:
+          - mariadb-server
+          - MySQL-python
+        state: present
+
+    - name: Copy the MySQL configuration file
+      copy:
+        src: files/my.cnf
+        dest: /etc/my.cnf
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Start and enable the MariaDB service
+      systemd:
+        name: mariadb
+        state: started
+        enabled: yes
+
+    - name: Start and enable the firewalld service
+      systemd:
+        name: firewalld
+        state: started
+        enabled: yes
+
+    - name: Insert firewalld rule to allow MySQL port
+      firewalld:
+        port: 3306/tcp
+        permanent: yes
+        state: enabled
+        immediate: yes
+        zone: public
+
+Let us now configure MariaDB Database and add some inventory data for our e-commerce store. Update the playbook to add a play to perform the following tasks on lamp-db
+
+
+1. Create Application Database
+Use the dbname variable from inventory as the name of the database
+
+2. Create Application Database User
+Use inventory variables dbuser dbpassword from inventory.
+
+host should be set to IP address of web server 172.20.1.100
+
+priv should be set to *.*:ALL
+
+3. Copy db-load-script.sql file to /tmp directory on the database server
+4. Load Inventory data by running the below shell command on the database server
+mysql -f < /tmp/db-load-script.sql
+
+Playbook: ~/playbooks/lamp-stack-playbooks/deploy-lamp-stack.yml
+
+
+
+
+---
+- name: Deploy LAMP
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install common dependencies
+      yum:
+        name:
+          - libselinux-python
+          - libsemanage-python
+          - firewalld
+        state: present
+
+- name: Configure MariaDB on lamp-db
+  hosts: lamp-db
+  become: yes
+  tasks:
+    - name: Install MariaDB and MySQL-python packages
+      yum:
+        name:
+          - mariadb-server
+          - MySQL-python
+        state: present
+
+    - name: Copy the MySQL configuration file
+      copy:
+        src: files/my.cnf
+        dest: /etc/my.cnf
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Start and enable the MariaDB service
+      systemd:
+        name: mariadb
+        state: started
+        enabled: yes
+
+    - name: Start and enable the firewalld service
+      systemd:
+        name: firewalld
+        state: started
+        enabled: yes
+
+    - name: Insert firewalld rule to allow MySQL port
+      firewalld:
+        port: 3306/tcp
+        permanent: yes
+        state: enabled
+        immediate: yes
+        zone: public
+
+- name: Configure MariaDB Database and load inventory data
+  hosts: lamp-db
+  become: yes
+  tasks:
+    - name: Create Application Database
+      mysql_db:
+        name: "{{ dbname }}"
+        state: present
+
+    - name: Create Application Database User
+      mysql_user:
+        name: "{{ dbuser }}"
+        password: "{{ dbpassword }}"
+        host: "172.20.1.100"
+        priv: "*.*:ALL"
+        state: present
+
+    - name: Copy db-load-script.sql to /tmp directory
+      copy:
+        src: files/db-load-script.sql
+        dest: /tmp/db-load-script.sql
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Load Inventory data
+      command: mysql -f < /tmp/db-load-script.sql
+      args:
+        creates: /tmp/db-load-script.sql
+
+
+
+
+We now proceed to Installing web service on the web server.
+
+
+1. Install Web Server
+Install httpd, php and php-mysql packages
+
+2. Install Git to download source code
+package: git
+
+3. Start and enable the firewalld service
+4. Insert firewalld rule for httpd
+For port use httpd_port/tcp variable.
+
+4. Set index.php as the default page
+Modify line "DirectoryIndex index.html" to "DirectoryIndex index.php" in file /etc/httpd/conf/httpd.conf
+
+5. Start and enable the httpd service
+Playbook: ~/playbooks/lamp-stack-playbooks/deploy-lamp-stack.yml
+
+
+
+
+---
+- name: Deploy LAMP
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install common dependencies
+      yum:
+        name:
+          - libselinux-python
+          - libsemanage-python
+          - firewalld
+        state: present
+
+- name: Configure MariaDB on lamp-db
+  hosts: lamp-db
+  become: yes
+  tasks:
+    - name: Install MariaDB and MySQL-python packages
+      yum:
+        name:
+          - mariadb-server
+          - MySQL-python
+        state: present
+
+    - name: Copy the MySQL configuration file
+      copy:
+        src: files/my.cnf
+        dest: /etc/my.cnf
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Start and enable the MariaDB service
+      systemd:
+        name: mariadb
+        state: started
+        enabled: yes
+
+    - name: Start and enable the firewalld service
+      systemd:
+        name: firewalld
+        state: started
+        enabled: yes
+
+    - name: Insert firewalld rule to allow MySQL port
+      firewalld:
+        port: 3306/tcp
+        permanent: yes
+        state: enabled
+        immediate: yes
+        zone: public
+
+- name: Configure MariaDB Database and load inventory data
+  hosts: lamp-db
+  become: yes
+  tasks:
+    - name: Create Application Database
+      mysql_db:
+        name: "{{ dbname }}"
+        state: present
+
+    - name: Create Application Database User
+      mysql_user:
+        name: "{{ dbuser }}"
+        password: "{{ dbpassword }}"
+        host: "172.20.1.100"
+        priv: "*.*:ALL"
+        state: present
+
+    - name: Copy db-load-script.sql to /tmp directory
+      copy:
+        src: files/db-load-script.sql
+        dest: /tmp/db-load-script.sql
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Load Inventory data
+      command: mysql -f < /tmp/db-load-script.sql
+      args:
+        creates: /tmp/db-load-script.sql
+
+- name: Install web service on lamp-web
+  hosts: lamp-web
+  become: yes
+  tasks:
+    - name: Install httpd, php, and php-mysql packages
+      yum:
+        name:
+          - httpd
+          - php
+          - php-mysql
+        state: present
+
+    - name: Install Git package
+      yum:
+        name: git
+        state: present
+
+    - name: Start and enable the firewalld service
+      systemd:
+        name: firewalld
+        state: started
+        enabled: yes
+
+    - name: Insert firewalld rule for httpd
+      firewalld:
+        port: "{{ httpd_port }}/tcp"
+        permanent: yes
+        state: enabled
+        immediate: yes
+        zone: public
+
+    - name: Set index.php as the default page
+      lineinfile:
+        path: /etc/httpd/conf/httpd.conf
+        regexp: '^DirectoryIndex'
+        line: 'DirectoryIndex index.php'
+        state: present
+
+    - name: Start and enable the httpd service
+      systemd:
+        name: httpd
+        state: started
+        enabled: yes
+
+
+
+---
+- name: Deploy LAMP
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install common dependencies
+      yum:
+        name:
+          - libselinux-python
+          - libsemanage-python
+          - firewalld
+        state: present
+
+- name: Configure MariaDB on lamp-db
+  hosts: lamp-db
+  become: yes
+  tasks:
+    - name: Install MariaDB and MySQL-python packages
+      yum:
+        name:
+          - mariadb-server
+          - MySQL-python
+        state: present
+
+    - name: Copy the MySQL configuration file
+      copy:
+        src: files/my.cnf
+        dest: /etc/my.cnf
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Start and enable the MariaDB service
+      systemd:
+        name: mariadb
+        state: started
+        enabled: yes
+
+    - name: Start and enable the firewalld service
+      systemd:
+        name: firewalld
+        state: started
+        enabled: yes
+
+    - name: Insert firewalld rule to allow MySQL port
+      firewalld:
+        port: 3306/tcp
+        permanent: yes
+        state: enabled
+        immediate: yes
+        zone: public
+
+- name: Configure MariaDB Database and load inventory data
+  hosts: lamp-db
+  become: yes
+  tasks:
+    - name: Create Application Database
+      mysql_db:
+        name: "{{ dbname }}"
+        state: present
+
+    - name: Create Application Database User
+      mysql_user:
+        name: "{{ dbuser }}"
+        password: "{{ dbpassword }}"
+        host: "172.20.1.100"
+        priv: "*.*:ALL"
+        state: present
+
+    - name: Copy db-load-script.sql to /tmp directory
+      copy:
+        src: files/db-load-script.sql
+        dest: /tmp/db-load-script.sql
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Load Inventory data
+      command: mysql -f < /tmp/db-load-script.sql
+      args:
+        creates: /tmp/db-load-script.sql
+
+- name: Install web service on lamp-web
+  hosts: lamp-web
+  become: yes
+  tasks:
+    - name: Install httpd, php, and php-mysql packages
+      yum:
+        name:
+          - httpd
+          - php
+          - php-mysql
+        state: present
+
+    - name: Install Git package
+      yum:
+        name: git
+        state: present
+
+    - name: Start and enable the firewalld service
+      systemd:
+        name: firewalld
+        state: started
+        enabled: yes
+
+    - name: Insert firewalld rule for httpd
+      firewalld:
+        port: "{{ httpd_port }}/tcp"
+        permanent: yes
+        state: enabled
+        immediate: yes
+        zone: public
+
+    - name: Set index.php as the default page
+      lineinfile:
+        path: /etc/httpd/conf/httpd.conf
+        regexp: '^DirectoryIndex'
+        line: 'DirectoryIndex index.php'
+        state: present
+
+    - name: Start and enable the httpd service
+      systemd:
+        name: httpd
+        state: started
+        enabled: yes
+
+
+Finally, let us download the latest source code of our web application and upload the index.php file.
+
+
+1. Clone the source code from the repository
+The address of the URL is given in the inventory file. Use the right variable. Clone it to /var/www/html/
+
+2. Copy the custom index.php file
+from files/index.php to /var/www/html/index.php
+
+Playbook: ~/playbooks/lamp-stack-playbooks/deploy-lamp-stack.yml
+
+---
+- name: Deploy LAMP
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install common dependencies
+      yum:
+        name:
+          - libselinux-python
+          - libsemanage-python
+          - firewalld
+        state: present
+
+- name: Configure MariaDB on lamp-db
+  hosts: lamp-db
+  become: yes
+  tasks:
+    - name: Install MariaDB and MySQL-python packages
+      yum:
+        name:
+          - mariadb-server
+          - MySQL-python
+        state: present
+
+    - name: Copy the MySQL configuration file
+      copy:
+        src: files/my.cnf
+        dest: /etc/my.cnf
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Start and enable the MariaDB service
+      systemd:
+        name: mariadb
+        state: started
+        enabled: yes
+
+    - name: Start and enable the firewalld service
+      systemd:
+        name: firewalld
+        state: started
+        enabled: yes
+
+    - name: Insert firewalld rule to allow MySQL port
+      firewalld:
+        port: 3306/tcp
+        permanent: yes
+        state: enabled
+        immediate: yes
+        zone: public
+
+- name: Configure MariaDB Database and load inventory data
+  hosts: lamp-db
+  become: yes
+  tasks:
+    - name: Create Application Database
+      mysql_db:
+        name: "{{ dbname }}"
+        state: present
+
+    - name: Create Application Database User
+      mysql_user:
+        name: "{{ dbuser }}"
+        password: "{{ dbpassword }}"
+        host: "172.20.1.100"
+        priv: "*.*:ALL"
+        state: present
+
+    - name: Copy db-load-script.sql to /tmp directory
+      copy:
+        src: files/db-load-script.sql
+        dest: /tmp/db-load-script.sql
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Load Inventory data
+      command: mysql -f < /tmp/db-load-script.sql
+      args:
+        creates: /tmp/db-load-script.sql
+
+- name: Install web service on lamp-web
+  hosts: lamp-web
+  become: yes
+  tasks:
+    - name: Install httpd, php, and php-mysql packages
+      yum:
+        name:
+          - httpd
+          - php
+          - php-mysql
+        state: present
+
+    - name: Install Git package
+      yum:
+        name: git
+        state: present
+
+    - name: Start and enable the firewalld service
+      systemd:
+        name: firewalld
+        state: started
+        enabled: yes
+
+    - name: Insert firewalld rule for httpd
+      firewalld:
+        port: "{{ httpd_port }}/tcp"
+        permanent: yes
+        state: enabled
+        immediate: yes
+        zone: public
+
+    - name: Set index.php as the default page
+      lineinfile:
+        path: /etc/httpd/conf/httpd.conf
+        regexp: '^DirectoryIndex'
+        line: 'DirectoryIndex index.php'
+        state: present
+
+    - name: Start and enable the httpd service
+      systemd:
+        name: httpd
+        state: started
+        enabled: yes
+
+    - name: Clone the source code from the repository
+      git:
+        repo: "{{ repository }}"
+        dest: /var/www/html/
+        version: HEAD
+
+    - name: Copy the custom index.php file
+      copy:
+        src: files/index.php
+        dest: /var/www/html/index.php
+        owner: root
+        group: root
+        mode: '0644'
+

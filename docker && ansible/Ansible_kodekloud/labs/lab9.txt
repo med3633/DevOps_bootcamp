@@ -1,0 +1,84 @@
+Create a playbook httpd.yml under ~/playbooks/ to install httpd package on web1 node using Ansible’s yum module.
+
+---
+- name: Install httpd on web1
+  hosts: web1
+  become: yes
+  tasks:
+    - name: Install httpd package
+      yum:
+        name: httpd
+        state: present
+
+We have an rpm available for wget package on URL http://mirror.centos.org/centos/7/os/x86_64/Packages/wget-1.14-18.el7_6.1.x86_64.rpm. Create a playbook with name wget.yml under ~/playbooks to install that rpm on web1 node using yum module.
+
+---
+- name: Install wget from RPM on web1
+  hosts: web1
+  become: yes
+  tasks:
+    - name: Install wget package
+      yum:
+        name: http://mirror.centos.org/centos/7/os/x86_64/Packages/wget-1.14-18.el7_6.1.x86_64.rpm
+        state: present
+
+There is a playbook under ~/playbooks named as unzip.yml to install unzip package on web1 node. We want to install unzip-5.52 version of this package so before running the playbook make the required changes.
+
+
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: Install unzip package
+      yum:
+        name: unzip-5.52
+        state: present
+
+Our playbook - iotop.yml - to install the latest version of iotop package keeps failing. Please fix the issue so that playbook can work.
+
+
+The playbook is located under ~/playbooks directory. And the inventory file is inventory
+
+---
+- name: Install iotop
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install latest iotop package
+      yum:
+        name: iotop
+        state: latest
+
+We want to install some more packages on web1 node. Create a playbook ~/playbooks/multi-pkgs.yml to install the latest version of sudo package, moreover we already have vsftpd v3.0.2 installed but due to some compatibility issues we want to install vsftpd v2.2.2 so add a task in same playbook to do so.
+
+
+---
+- name: Install sudo and downgrade vsftpd
+  hosts: web1
+  become: yes
+  tasks:
+    - name: Install the latest version of sudo
+      yum:
+        name: sudo
+        state: latest
+
+    - name: Install specific version of vsftpd
+      yum:
+        name: vsftpd-2.2.2
+        state: present
+
+    - name: Verify sudo installation
+      command: rpm -q sudo
+      register: sudo_version
+
+    - name: Print sudo version
+      debug:
+        msg: "Installed sudo version is: {{ sudo_version.stdout }}"
+
+    - name: Verify vsftpd installation
+      command: rpm -q vsftpd
+      register: vsftpd_version
+
+    - name: Print vsftpd version
+      debug:
+        msg: "Installed vsftpd version is: {{ vsftpd_version.stdout }}"

@@ -1,0 +1,253 @@
+Let us practice Jinja2 Templates with Ansible. Let us start with the monitoring server scenario. A monitoring server has newly been introduced in our environment.
+We need to update the agents.conf file with a list of the servers in our environment and their details.
+
+
+Navigate to the ~/playbooks/monitoring-server. The list of the servers are given in the inventory file under group lamp_app.
+This information must be used to generate an agents.conf file at /etc/monitor/agents.conf on the monitoring_server. 
+Develop a playbook generate-agent-info.yml A template file is already given. Use it. A sample output file is given at sample_agents.conf for your reference.
+The target servers are not up yet. So don't try to connect to them. Just use their information from the inventory file.
+##inventory 
+monitoring_server ansible_host=172.20.1.100 ansible_ssh_pass=Passw0rd ansible_user=root
+
+[lamp_app]
+web0001 ansible_hostname=web0001.company.com ansible_host=10.1.1.101 monitor_port=8080 protocol=http
+web0002 ansible_hostname=web0002.company.com ansible_host=10.1.1.102 monitor_port=8080 protocol=http
+db0003 ansible_hostname=db0003.company.com ansible_host=10.1.1.103 monitor_port=3306 protocol=tcp
+db0004 ansible_hostname=db0004.company.com ansible_host=10.1.1.104 monitor_port=3306 protocol=tcp
+db0005 ansible_hostname=db0005.company.com ansible_host=10.1.1.105 monitor_port=3306 protocol=tcp
+##sample_agents.conf 
+hostname, ipaddress, monitor_port, protocol
+web0001, 10.1.1.101, 8080, http
+web0002, 10.1.1.102, 8080, http
+db0003, 10.1.1.103, 3306, tcp
+db0004, 10.1.1.104, 3306, tcp
+db0005, 10.1.1.105, 3306, tcp
+##templates/agents.conf.j2 
+hostname, ipaddress, monitor_port, type, protocol
+#########solution
+##templates/agents.conf.j2 
+hostname, ipaddress, monitor_port, protocol
+{% for host in groups['lamp_app'] %}
+{{ hostvars[host].ansible_hostname }}, {{ hostvars[host].ansible_host }}, {{ hostvars[host].monitor_port }}, {{ hostvars[host].protocol }}
+{% endfor %}
+##generate_agent_conf.yml
+---
+- name: Generate agents.conf for monitoring server
+  hosts: monitoring_server
+  gather_facts: no
+  tasks:
+    - name: Generate agents.conf file from template
+      template:
+        src: templates/agents.conf.j2
+        dest: /etc/monitor/agents.conf
+
+The next task is to configure a load-balancer to distribute traffic to web servers. Everything is already setup.
+
+
+All you need to do is navigate to the ~/playbooks/load-balancer directory.
+A template of the load-balancer configuration file is given under the templates directory.
+Update it to add the IPs of the servers under the web group. A sample output file is at sample-load-balancer.conf.
+Create playbook configure-load-balancer.yml to upload the file to /etc/nginx/conf.d/load-balancer.conf
+##cat inventory 
+load_balancer ansible_host=172.20.1.100 ansible_ssh_pass=Passw0rd ansible_user=root
+
+[web]
+web0001 ansible_hostname=web0001.company.com ansible_host=172.20.1.102 ansible_ssh_pass=Passw0rd
+web0002 ansible_hostname=web0002.company.com ansible_host=172.20.1.103 ansible_ssh_pass=Passw0rd
+web0003 ansible_hostname=web0003.company.com ansible_host=172.20.1.104 ansible_ssh_pass=Passw0rd
+####cat sample-load-balancer.conf 
+# Define which servers to include in the load balancing scheme.
+# It's best to use the servers' private IPs for better performance and security.
+# You can find the private IPs at your UpCloud control panel Network section.
+http {
+   upstream backend {
+      server 10.1.0.101;
+      server 10.1.0.102;
+      server 10.1.0.103;
+   }
+
+   # This server accepts all traffic to port 80 and passes it to the upstream.
+   # Notice that the upstream name and the proxy_pass need to match.
+
+   server {
+      listen 80;
+
+      location / {
+          proxy_pass http://backend;
+      }
+   }
+}
+############solution 
+template/jenja
+# Define which servers to include in the load balancing scheme.
+# It's best to use the servers' private IPs for better performance and security.
+# You can find the private IPs at your UpCloud control panel Network section.
+http {
+   upstream backend {
+        {% for host in groups['web'] %}
+      server  {{ hostvars[host]['ansible_host'] }};
+       {% endfor %}
+
+   }
+
+   # This server accepts all traffic to port 80 and passes it to the upstream.
+   # Notice that the upstream name and the proxy_pass need to match.
+
+   server {
+      listen 80;
+
+      location / {
+          proxy_pass http://backend;
+      }
+   }
+}
+##cat configure-load-balancer.yml 
+- hosts: all
+  tasks:
+    - template:
+        src: load-balancer.conf.j2
+        dest: /etc/nginx/conf.d/load-balancer.conf
+      run_once: yes
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+The next task is to create an inventory report for all nodes in the environment.
+
+
+Navigate to the ~/playbooks/inventory directory. A template of the report is given under the templates directory. Update the template to print the requested details of all hosts under the web group. The report must be generated and placed on the inventory_server at /tmp/inventory.csv.
+Use ansible_architecture, ansible_distribution_version, ansible_memtotal_mb, ansible_processor_cores & ansible_processor_count variables from facts gathered on each host.
+##cat inventory 
+inventory_server ansible_host=172.20.1.100 ansible_ssh_pass=Passw0rd ansible_user=root
+
+[web]
+web0001 ansible_hostname=web0001.company.com ansible_host=172.20.1.101 ansible_ssh_pass=Passw0rd ansible_user=root
+web0002 ansible_hostname=web0002.company.com ansible_host=172.20.1.101 ansible_ssh_pass=Passw0rd ansible_user=root
+web0003 ansible_hostname=web0003.company.com ansible_host=172.20.1.101 ansible_ssh_pass=Passw0rd ansible_user=root
+
+
+##cat sample_inventory.csv 
+hostname, architecture, distribution_version, mem_total_mb, processor_cores, processor_count
+db0001, x86_64, 7.6.1810, 3023, 2, 1
+host0002, x86_64, 7.6.1810, 3023, 2, 1
+host0003, x86_64, 7.6.1810, 3023, 2, 1
+##########solution
+##temlpate/j2
+hostname, architecture, distribution_version, mem_total_mb, processor_cores, processor_count
+{% for host in groups['web'] %}
+{{ host }}, {{ hostvars[host]['ansible_architecture'] }}, {{ hostvars[host]['ansible_distribution_version'] }}, {{ hostvars[host]['ansible_memtotal_mb'] }}, {{ hostvars[host]['ansible_processor_cores'] }}, {{ hostvars[host]['ansible_processor_count'] }}
+{% endfor %}
+##generate-inventory.yml
+- hosts: all
+  tasks:
+  - setup:
+
+- hosts: inventory_server
+  tasks:
+    - template:
+        src: inventory.csv.j2
+        dest: /tmp/inventory.csv
+      run_once: yes
+
+The next task is to create a performance report for all nodes in the environment.
+
+
+Navigate to the ~/playbooks/report directory. A template of the report is given under the templates directory. Update the template print the requested details of all hosts under the web group. A sample report is given at sample_report.csv. The report must be generated and placed on the reporting_server at /tmp/report.csv
+
+Show free memory and update
+
+cat inventory 
+reporting_server ansible_host=172.20.1.100 ansible_ssh_pass=Passw0rd ansible_user=root
+
+[web]
+web0001 ansible_hostname=web0001.company.com ansible_host=172.20.1.101 ansible_ssh_pass=Passw0rd ansible_user=root
+web0002 ansible_hostname=web0002.company.com ansible_host=172.20.1.101 ansible_ssh_pass=Passw0rd ansible_user=root
+web0003 ansible_hostname=web0003.company.com ansible_host=172.20.1.101 ansible_ssh_pass=Passw0rd ansible_user=root
+
+
+cat sample_report.csv 
+hostname, free memory, uptime
+web0001, 1443, 6720
+web0002, 1444, 6720
+web0003, 1444, 6720
+####### solution
+##template/j2
+hostname, free memory, uptime
+{% for host in groups['web'] %}
+{{ host }}, {{ hostvars[host]['ansible_memfree_mb'] }}, {{ hostvars[host]['ansible_uptime_seconds'] }}
+{% endfor %}
+## generate-report.yml
+- hosts: all
+  gather_facts: yes
+  tasks:
+    - template:
+        src: report.csv.j2
+        dest: /tmp/report.csv
+      delegate_to: reporting_server
+      run_once: yes
+
+We have 2 environments distributed geographically and a DNS server in each. We would like to generate a file on each of these DNS servers with the list of the hosts and IPs in their respective regions.
+
+
+Navigate to the ~/playbooks/dns directory. 
+Create a template file that prints the hostname and IP address of each host in new line and upload that to the respective server. 
+A sample report is given at sample_hosts.txt. The report must be generated and placed on the respective DNS server at /tmp/hosts.txt. 
+Write playbook at generate-hosts-ips.yml. Note that these servers are not up yet. So don't try to connect to them or gather facts. 
+Use the details available in the inventory file to achieve this.
+##cat inventory 
+dns_server_america ansible_host=172.20.1.100 ansible_ssh_pass=Passw0rd ansible_user=root
+dns_server_asia ansible_host=172.20.1.101 ansible_ssh_pass=Passw0rd ansible_user=root
+
+[america]
+web0001 ansible_hostname=web0001.company.com ansible_host=10.1.1.101 ansible_ssh_pass=Passw0rd
+web0002 ansible_hostname=web0002.company.com ansible_host=10.1.1.102 ansible_ssh_pass=Passw0rd
+web0003 ansible_hostname=web0003.company.com ansible_host=10.1.1.103 ansible_ssh_pass=Passw0rd
+web0004 ansible_hostname=web0004.company.com ansible_host=10.1.1.104 ansible_ssh_pass=Passw0rd
+web0005 ansible_hostname=web0005.company.com ansible_host=10.1.1.105 ansible_ssh_pass=Passw0rd
+
+[asia]
+web2001 ansible_hostname=web2001.company.com ansible_host=10.1.1.201 ansible_ssh_pass=Passw0rd
+web2002 ansible_hostname=web2002.company.com ansible_host=10.1.1.202 ansible_ssh_pass=Passw0rd
+web2003 ansible_hostname=web2003.company.com ansible_host=10.1.1.203 ansible_ssh_pass=Passw0rd
+web2004 ansible_hostname=web2004.company.com ansible_host=10.1.1.204 ansible_ssh_pass=Passw0rd
+web2005 ansible_hostname=web2005.company.com ansible_host=10.1.1.205 ansible_ssh_pass=Passw0rd
+
+##cat sample_hosts.txt 
+host001 192.168.1.1
+host002 192.168.1.2
+host003 192.168.1.3
+
+###solution
+##cat templates/hosts.j2 
+# eg: host001 192.168.1.1
+{% for host in groups[GROUP_NAME] %}
+{{ host }} {{ hostvars[host]['ansible_host'] }}
+{% endfor %}
+##cat generate-hosts-ips.yml
+- name: Generate dns hosts files on americas servers
+  hosts: dns_server_america
+  tasks:
+  - template: src=templates/hosts.j2 dest=/tmp/hosts.txt
+    vars:
+      GROUP_NAME: america
+
+- name: Generate dns hosts files on asia servers
+  hosts: dns_server_asia
+  tasks:
+  - template: src=templates/hosts.j2 dest=/tmp/hosts.txt
+    vars:
+      GROUP_NAME: asia
+
+
+
+

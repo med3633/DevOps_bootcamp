@@ -1,0 +1,240 @@
+Change the default inventory source/file to ~/playbooks/inventory inside the local ansible.cfg file.
+ChatGPT
+To change the default inventory source/file to ~/playbooks/inventory inside the local ansible.cfg file, follow these steps:
+
+Create a Copy of the Default ansible.cfg File: If you haven't already copied the default ansible.cfg file to your ~/playbooks directory, do so now.
+
+Edit the Copied ansible.cfg File: Modify the copied ansible.cfg file to set the inventory parameter to ~/playbooks/inventory.
+
+Step-by-Step Guide:
+Copy the Default ansible.cfg File:
+
+Assuming the default ansible.cfg file is located at /etc/ansible/ansible.cfg, you can copy it to your ~/playbooks directory using the following command:
+
+sh
+Copier le code
+cp /etc/ansible/ansible.cfg ~/playbooks/ansible.cfg
+Edit the Copied ansible.cfg File:
+
+Open the copied ansible.cfg file in your preferred text editor. For example, using nano:
+
+sh
+Copier le code
+nano ~/playbooks/ansible.cfg
+Add or modify the following line under the [defaults] section:
+
+ini
+Copier le code
+[defaults]
+inventory = /home/thor/playbooks/inventory
+If the [defaults] section already exists, just add the inventory line. If it doesn't exist, create the section and add the line.
+
+Save and Close the File:
+
+Save the changes and close the text editor. For example, in nano, you can save by pressing CTRL + O and then CTRL + X to exit.
+
+Example ansible.cfg File:
+Your ansible.cfg file in the ~/playbooks directory should look like this:
+
+ini
+Copier le code
+[defaults]
+inventory = /home/thor/playbooks/inventory
+This configuration sets the default inventory source to ~/playbooks/inventory when running Ansible commands from the ~/playbooks directory.
+
+Verify the Configuration:
+To ensure the configuration is being applied correctly, you can run a simple Ansible command from the ~/playbooks directory:
+
+sh
+Copier le code
+cd ~/playbooks
+ansible all -m ping
+This command should use the inventory file located at ~/playbooks/inventory to attempt to ping all hosts listed in that inventory. If you see successful ping responses, your configuration is correct.
+
+Our hosts are spread worldwide, and it takes normally 30 seconds to establish an SSH connection, make the necessary changes so that Ansible doesn't face SSH timeout issues .
+ChatGPT
+To avoid SSH timeout issues due to long connection times, you can adjust the SSH timeout settings in your ansible.cfg file. Specifically, you can set the timeout parameter to a higher value to accommodate the longer connection times.
+
+Here's how to do it:
+
+Edit the ansible.cfg File: Modify the ansible.cfg file to set the SSH connection timeout to a higher value.
+Step-by-Step Guide:
+Open the ansible.cfg File:
+
+If you already have an ansible.cfg file in your ~/playbooks directory, open it in your preferred text editor. For example, using nano:
+
+sh
+Copier le code
+nano ~/playbooks/ansible.cfg
+Set the SSH Connection Timeout:
+
+Add or modify the following lines under the [defaults] and [ssh_connection] sections:
+
+ini
+Copier le code
+[defaults]
+inventory = /home/thor/playbooks/inventory
+
+[ssh_connection]
+timeout = 60
+The timeout parameter under [ssh_connection] section sets the timeout for SSH connections to 60 seconds. You can adjust this value as needed.
+
+Save and Close the File:
+
+Save the changes and close the text editor. For example, in nano, you can save by pressing CTRL + O and then CTRL + X to exit.
+
+Example ansible.cfg File:
+Your ansible.cfg file in the ~/playbooks directory should look like this:
+
+ini
+Copier le code
+[defaults]
+inventory = /home/thor/playbooks/inventory
+
+[ssh_connection]
+timeout = 60
+This configuration sets the default inventory source to ~/playbooks/inventory and increases the SSH connection timeout to 60 seconds.
+
+Verify the Configuration:
+To ensure the configuration is being applied correctly, you can run a simple Ansible command from the ~/playbooks directory:
+
+sh
+Copier le code
+cd ~/playbooks
+ansible all -m ping
+This command should use the adjusted SSH timeout setting, allowing for longer connection times without timing out. If you see successful ping responses, your configuration is correct.
+
+Disable deprecation warnings for Ansible.
+
+ChatGPT
+To disable deprecation warnings in Ansible, you can modify the ansible.cfg file to include the deprecation_warnings parameter and set it to False.
+
+Here’s how you can do it:
+
+Open the ansible.cfg File:
+
+If you already have an ansible.cfg file in your ~/playbooks directory, open it in your preferred text editor. For example, using nano:
+
+sh
+Copier le code
+nano ~/playbooks/ansible.cfg
+Set the deprecation_warnings Parameter:
+
+Add or modify the following line under the [defaults] section:
+
+ini
+Copier le code
+[defaults]
+inventory = /home/thor/playbooks/inventory
+deprecation_warnings = False
+
+[ssh_connection]
+timeout = 60
+Save and Close the File:
+
+Save the changes and close the text editor. For example, in nano, you can save by pressing CTRL + O and then CTRL + X to exit.
+
+Example ansible.cfg File:
+Your ansible.cfg file in the ~/playbooks directory should look like this:
+
+ini
+Copier le code
+[defaults]
+inventory = /home/thor/playbooks/inventory
+deprecation_warnings = False
+
+[ssh_connection]
+timeout = 60
+This configuration sets the default inventory source to ~/playbooks/inventory, increases the SSH connection timeout to 60 seconds, and disables deprecation warnings.
+
+Verify the Configuration:
+To ensure the configuration is being applied correctly, you can run a simple Ansible command from the ~/playbooks directory:
+
+sh
+Copier le code
+cd ~/playbooks
+ansible all -m ping
+This command should use the adjusted settings, including the disabled deprecation warnings. If you see successful ping responses and no deprecation warnings, your configuration is correct.
+
+Disable facts gathering for all hosts so that you don't have to explicitly disable facts gathering within the playbooks.
+
+and explicate in french explicite et implicite facts
+ChatGPT
+To disable fact gathering globally in Ansible, you can adjust the gathering and gather_subset parameters in your ansible.cfg file. This way, you won't need to disable fact gathering explicitly in every playbook.
+
+Here’s how to do it:
+
+Open the ansible.cfg File:
+
+Open the ansible.cfg file in your preferred text editor. For example, using nano:
+
+sh
+Copier le code
+nano ~/playbooks/ansible.cfg
+Set the gathering and gather_subset Parameters:
+
+Add or modify the following lines under the [defaults] section:
+
+ini
+Copier le code
+[defaults]
+inventory = /home/thor/playbooks/inventory
+deprecation_warnings = False
+gathering = explicit
+gather_subset = '!all'
+
+[ssh_connection]
+timeout = 60
+gathering = explicit disables fact gathering unless it is explicitly enabled in the playbook.
+gather_subset = '!all' ensures that no facts are gathered by default.
+Save and Close the File:
+
+Save the changes and close the text editor. For example, in nano, you can save by pressing CTRL + O and then CTRL + X to exit.
+
+Example ansible.cfg File:
+Your ansible.cfg file in the ~/playbooks directory should look like this:
+
+ini
+Copier le code
+[defaults]
+inventory = /home/thor/playbooks/inventory
+deprecation_warnings = False
+gathering = explicit
+gather_subset = '!all'
+
+[ssh_connection]
+timeout = 60
+This configuration sets the default inventory source to ~/playbooks/inventory, increases the SSH connection timeout to 60 seconds, disables deprecation warnings, and disables fact gathering unless explicitly enabled in the playbook.
+
+Verify the Configuration:
+To ensure the configuration is being applied correctly, you can run a simple Ansible command from the ~/playbooks directory:
+
+sh
+Copier le code
+cd ~/playbooks
+ansible all -m ping
+This command should use the adjusted settings, including the disabled fact gathering.
+
+Explication en français : Faits explicites et implicites
+Faits Explicites
+Les faits explicites sont ceux qui sont spécifiquement demandés dans le fichier de configuration ou dans le playbook. Cela signifie que vous devez explicitement activer la collecte de faits si vous en avez besoin pour certaines tâches. Par exemple :
+
+yaml
+Copier le code
+- hosts: all
+  tasks:
+    - name: Collecter des faits
+      setup:
+Faits Implicites
+Les faits implicites sont ceux qui sont collectés automatiquement par Ansible lors de l'exécution d'un playbook, sans que vous ayez à le demander explicitement. Par défaut, Ansible collecte des faits sur tous les hôtes à moins que cela ne soit désactivé.
+
+Désactivation de la collecte de faits
+En configurant gathering = explicit et gather_subset = '!all' dans le fichier ansible.cfg, vous désactivez la collecte de faits par défaut. Ainsi, les faits ne seront collectés que lorsque vous l'avez explicitement demandé dans un playbook. Cela peut aider à réduire le temps d'exécution des playbooks et à éviter des problèmes de performance.
+
+En résumé, la configuration que nous avons appliquée rend la collecte de faits explicite, ce qui signifie qu'elle ne se produit que lorsqu'elle est explicitement spécifiée dans les playbooks.
+
+
+
+
+
+

@@ -1,0 +1,49 @@
+Let's start using roles. In the ~/playbooks/db directory we are attempting to configure mysql on a database server. A partially developed playbook is available. We have planned to use a role in the playbook.
+
+
+First, install the kodekloud1.mysql role on the ansible controller.
+In case of any errors during the installation of the role, employ the --ignore-certs flag.
+##ansible-galaxy install kodekloud1.mysql --ignore-certs
+Update the playbook to use the newly created role to configure the database server.
+##---
+- name: Deploy MySQL Server
+  hosts: db_server
+  roles:
+    - kodekloud1.mysql
+Let's configure a web server now. Navigate to the web directory. Install the geerlingguy.nginx role inside roles directory within the web directory.
+## ansible-galaxy install geerlingguy.nginx -p roles --ignore-errors
+Update the playbook to use the role geerlingguy.nginx to install nginx web server
+
+
+Pass in an additional parameter to the role to NOT configure the service to be enabled at startup. Use the parameter nginx_service_enabled. Check roles/geerlingguy.nginx/defaults/main.yml for more details.
+##---
+- name: Deploy Web Server
+  hosts: web_server
+  roles:
+    - name: geerlingguy.nginx
+      vars:
+        nginx_service_enabled: no
+Let us now create our own role. Navigate to the firewalld directory. A playbook deploy_firewalld.yml is given that installs and starts the firewalld service. Let us first create our own role and move the tasks into it.
+
+
+Create a role named ansible-role-firewalld under in the firewalld/roles directory.
+##ansible-galaxy init roles/ansible-role-firewalld
+Move the tasks from the playbook to the tasks/main.yml file inside the role. Then use the newly created role in the playbook
+##deploy_firewalld.yml
+---
+- name: Install common dependencies
+  yum:
+    name:
+      - firewalld
+    state: installed
+- name: Start firewalld
+  service: name=firewalld state=started enabled=yes
+##tasks/main.yml
+- name: Configure Firewalld
+  hosts: all
+  roles:
+    - ansible-role-firewalld
+
+
+
+

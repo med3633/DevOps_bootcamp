@@ -1,0 +1,55 @@
+What is the default value of become_user directive?
+root
+We want to change the login shell for a remote user while running an Ansible task, which directive will be used to do so?
+become_flags
+When the file was created on the host, the owner of the file became root user. However, file was to be created for the admin user. Please make the appropriate changes to the file.yml playbook so that the file is created as user admin.
+
+---
+- hosts: all
+  become: yes
+  gather_facts: no
+  tasks:
+    - name: Create a blank file with admin ownership
+      file:
+        path: /home/admin/test.txt
+        state: touch
+        owner: admin
+        group: admin
+        mode: '0644'
+
+
+There is a playbook file.yml under ~/playbooks/web2/ directory. We want to run file.yml playbook as admin user on web2 node, so modify the playbook accordingly. To run the playbook we have created a script web2.sh on the same location, so you can execute the script with command sh web2.sh. We don’t want to store the sudo password in any file due to security reasons. Make the necessary changes so that when the script is run, the playbook must prompt for the become password.
+
+
+ansible user's password on web2 is Passw0rd
+
+
+
+
+
+---
+- hosts: all
+  become: yes
+  become_user: admin
+  gather_facts: no
+  tasks:
+    - name: Create a blank file
+      file:
+        path: /home/admin/test.txt
+        state: touch
+        owner: admin
+        group: admin
+        mode: '0644'
+
+web2.sh
+#!/bin/bash
+ansible-playbook -i inventory --ask-become-pass file.yml
+
+We need privilege escalation to be enabled across all playbooks without having to specify in each play, make the necessary changes in /etc/ansible/ansible.cfg file to activate privilege escalation.
+
+[privilege_escalation]
+become=True
+become_method=sudo
+become_user=root
+become_ask_pass=False
+

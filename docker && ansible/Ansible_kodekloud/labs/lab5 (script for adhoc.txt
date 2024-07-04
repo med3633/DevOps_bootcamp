@@ -1,0 +1,31 @@
+-----------shell of AdHoc----------------
+#!/bin/bash
+
+# Print hostname of all managed nodes
+ansible all -i ~/playbooks/inventory -m command -a "hostname"
+
+# Copy /etc/resolv.conf from Ansible controller to /tmp/resolv.conf on node00
+ansible node00 -i ~/playbooks/inventory -m copy -a "src=/etc/resolv.conf dest=/tmp/resolv.conf"
+
+Create and run a playbook ~/playbooks/playbook.yml to cat the file /etc/redhat-release on all managed nodes in the inventory file ~/playbooks/inventory. Also please make sure to run this playbook in verbose mode i.e just add -vv at the end of your ansible-playbook command.
+
+[thor@ansible-controller playbooks]$ cat host_data.sh 
+#!/bin/bash
+
+# Set ANSIBLE_GATHERING to False
+export ANSIBLE_GATHERING=False
+
+# Print uptime of all managed nodes
+ansible all -i ~/playbooks/inventory -m command -a "uptime"
+
+# Create and run playbook to cat /etc/redhat-release
+ansible-playbook -i ~/playbooks/inventory ~/playbooks/playbook.yml -vv
+
+
+[thor@ansible-controller playbooks]$ cat playbook.yml 
+---
+- name: Display /etc/redhat-release
+  hosts: all
+  tasks:
+    - name: Cat /etc/redhat-release
+      command: cat /etc/redhat-release

@@ -1,0 +1,117 @@
+thor@ansible-controller playbooks]$ ll
+total 24
+-rwxrwx--- 1 thor thor 119 Mar 26 07:48 copy.yml
+-rwxrwx--- 1 thor thor 256 Mar 26 07:48 file.yml
+-rwxrwx--- 1 thor thor 105 Mar 26 07:48 httpd.yml
+-rwxrwx--- 1 thor thor 156 Mar 26 07:48 inventory
+-rwxrwx--- 1 thor thor   5 Mar 26 07:48 test.txt
+-rwxrwx--- 1 thor thor  98 Mar 26 07:48 web2.yml
+[thor@ansible-controller playbooks]$ cat copy.yml 
+---
+- hosts: web
+  tasks:
+    - name: copy test.txt file
+      copy:
+        src: test.txt
+        dest: /tmp/test.txt
+[thor@ansible-controller playbooks]$ cat inventory 
+[web]
+web1 ansible_host=172.20.1.100 ansible_ssh_pass=Passw0rd ansible_user=root
+web2 ansible_host=172.20.1.101 ansible_ssh_pass=Passw0rd ansible_user=root
+[thor@ansible-controller ~]$ cat playbooks/file.yml 
+---
+- hosts: web1
+  tasks:
+    - name: Create /tmp/testfile.txt
+      file:
+        path: /tmp/testfile.txt
+        state: touch
+
+- hosts: web2
+  tasks:
+    - name: Create /tmp/testfile.txt
+      file:
+        path: /tmp/testfile.txt
+        state: touch
+[thor@ansible-controller playbooks]$ cat web1.yml 
+---
+- hosts: web1
+  tasks:
+   - name: Create a blank file
+     file: path=/root/myfile.txt state=touch
+[thor@ansible-controller playbooks]$ ansible-playbook -i inventory httpd.yml --check
+ERROR! 'host' is not a valid attribute for a Play
+
+The error appears to have been in '/home/thor/playbooks/httpd.yml': line 2, column 3, but may
+be elsewhere in the file depending on the exact syntax problem.
+
+The offending line appears to be:
+
+---
+- host: web
+  ^ here
+---
+- hosts: web
+  tasks:
+    - name: Install httpd
+      yum:
+        name: httpd
+        state: present
+[thor@ansible-controller playbooks]$ ansible-playbook -i inventory web2.yml --check
+ERROR! Syntax Error while loading YAML.
+  did not find expected '-' indicator
+
+The error appears to have been in '/home/thor/playbooks/web2.yml': line 4, column 2, but may
+be elsewhere in the file depending on the exact syntax problem.
+
+The offending line appears to be:
+
+  tasks:
+ - name: echo Welcome!
+ ^ here
+---
+- hosts: web2
+  tasks:
+  - name: echo Welcome!
+    shell: 'echo "Welcome!" > /tmp/welcome.txt'
+Create a playbook user.yml under ~/playbooks directory to create a user named as angel on web1 node.
+---
+- hosts: web1
+  tasks:
+  - name: Create user
+    user: name=angel
+Distrubition
+---
+- hosts: web1
+  tasks:
+    - debug:
+        msg: "{{ ansible_os_family }}"
+A playbook is given at /home/thor/playbooks/db/playbook.yml. We are trying to print the server architecture. However it prints that the variable is not defined.
+---
+- hosts: db1
+  gather_facts: true  # This is the default setting, you can omit this line if it's not explicitly set to false
+  tasks:
+    - name: Get server architecture
+      debug:
+        msg: "{{ ansible_architecture }}"
+stock facts 
+---
+- name: Gather facts from web1 and store in a file
+  hosts: web1
+  tasks:
+    - name: Gather facts
+      setup:
+
+    - name: Save facts to a local file
+      local_action:
+        module: copy
+        content: "{{ ansible_facts | to_nice_json }}"
+        dest: /home/thor/playbooks/web/web-facts.txt
+Identify os_info 
+---
+- hosts: localhost
+  gather_facts: true
+  tasks:
+    - name: Print the OS distribution version
+      debug:
+        msg: "{{ ansible_distribution }} {{ ansible_distribution_version }}"

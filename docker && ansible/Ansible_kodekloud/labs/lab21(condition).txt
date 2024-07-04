@@ -1,0 +1,157 @@
+Which of the following is a valid conditional clause in an Ansible Playbook?
+==> when
+Which of the following is a valid conditional statement?
+=> when ansible_distrubition == centos && foo == ".."
+We are tasked to deploy an HTTP webserver using Ansible Playbooks. Install apache web server on all the hosts in the inventory /home/thor/playbooks/inventory. Note that they are of different flavours i,e. Ubuntu and CentOS.
+
+
+Develop a playbook /home/thor/playbooks/install_apache.yml that would install apache on both Ubuntu and CentOS. Note that the package name is apache2 on Ubuntu and httpd on CentOS
+---
+- name: Install apache
+  hosts: all
+  tasks:
+    # your code goes here...
+    # - install apache2 when Ubuntu
+    # - install httpd when CentOS
+---
+- name: Install apache
+  hosts: all
+  gather_facts: True
+  tasks:
+    - name: install apache2 when Ubuntu
+      package:
+        name: apache2
+        state: present
+      when: ansible_distribution == "Ubuntu"
+    - name: install httpd when CentOS
+      package:
+        name: httpd
+        state: present
+      when: ansible_distribution == "CentOS"
+
+Check if git package is installed on web2. Create a file /tmp/is_git_installed.txt, file's content should be based on the condition:
+
+If git is installed, print its installed version to the file and if git is absent, content must be: Oops, git is missing
+
+
+Write a playbook at /home/thor/playbooks/check_if_missing.yml and use the inventory file /home/thor/playbooks/inventory
+
+Note: web2 is a ubuntu host.
+
+---
+- hosts: web2
+  gather_facts: false
+  tasks:
+    - shell: dpkg -l git
+      register: check_if_git_installed
+      ignore_errors: true
+
+    - debug: var=check_if_git_installed
+    - shell: echo 'Oops, git is missing' > /tmp/is_git_installed.txt
+      when: check_if_git_installed.rc != 0
+
+    - shell: git --version > /tmp/is_git_installed.txt
+      when: check_if_git_installed.rc == 0
+
+Help your friend fix this playbook /home/thor/playbooks/copy_file_only_if.yml.
+
+
+Your firend is trying to copy this script /home/thor/playbooks/report_status.sh to web2 at location /usr/local/bin/report_status.sh based on a condition: if variable copy_file_only_if=true.
+
+Problem is: Even though (s)he is passing True or true the boolean variable set this way is being evaulated as string and the conditional is being skipped as Conditional result was False
+
+Please use the inventory file /home/thor/playbooks/inventory.
+---
+- name: copy script if not present
+  gather_facts: no
+  hosts: web2
+  vars:
+    remote_dest: /usr/local/bin/report_status.sh
+  tasks:
+    - copy:
+        src: report_status.sh
+        dest: "{{remote_dest}}"
+      when: copy_file_only_if is defined and copy_file_only_if == True
+      ###......................................problem is here ^
+      ### modify this so copy_file_only_if is evaluated as boolean.
+##solution
+---
+- name: copy script if not present
+  gather_facts: yes
+  hosts: web2
+  vars:
+    remote_dest: /usr/local/bin/report_status.sh
+  tasks:
+    - copy:
+        src: report_status.sh
+        dest: "{{remote_dest}}"
+      when: copy_file_only_if is defined and copy_file_only_if|bool
+      ###......................................problem is here ^
+      ### modify this so copy_file_only_if is evaluated as boolean.
+
+Check if report_status.sh copied earlier to web2 remote host is executable or not.
+If it is not executable, log the message: File report_status.sh is not executable, making it executable... in file /tmp/change.log on web2 remote host and make it executable.
+
+
+Develop a playbook /home/thor/playbooks/make_it_executable.yml and use the inventory file /home/thor/playbooks/inventory
+
+---
+- hosts: web2
+  gather_facts: no
+  vars:
+    remote_dest: /usr/local/bin/report_status.sh
+  tasks:
+    - stat:
+        path: "{{remote_dest}}"
+      register: file_status
+
+    - debug: var=file_status
+    - shell: echo "File report_status.sh is not executable, making it executable..." > /tmp/change.log
+      when: file_status.stat.exists and file_status.stat.executable == false
+
+    - name: Make the script executable
+      file:
+        path: "{{remote_dest}}"
+        mode: 0775
+
+The script report_status.sh executes a command to test if you are still vulnerable to Shellshock Vulnerability.
+The script outputs vulnerable if you are still vulnerable else echos not vulnerable. Note: You don't need to modify anything on the script.
+
+Write a playbook /home/thor/playbooks/check_if_vulnerable.yml and execute that script report_status.sh you copied earlier to test if you are vulnerable. If you are still vulnerable add a play to update package bash to the latest version.
+Use inventory /home/thor/playbooks/inventory.
+---
+- hosts: web2
+  gather_facts: no
+  tasks:
+    - name: Run a script
+      shell: sh /usr/local/bin/report_status.sh
+      register: test
+    - debug:
+        var: test
+
+Develop a playbook - /home/thor/playbooks/install_packages.yml - to install an extra package htop on web2 node. The package name htop must be passed as a value to a variable extra_packages with the -e option in the command line while running the playbook. The playbook install_packages.yml already has some exiting code, modify the task install extra packages so that it only runs if extra_packages variable is defined and it has value htop. At the end playbook must be able to install this extra package on web2 node while passing correct values in the extra vars i.e -e.
+
+
+Use inventory from /home/thor/playbooks/inventory.
+
+---
+- hosts: web2
+  gather_facts: no
+  tasks:
+    - name: install nginx
+      apt: name=nginx state=present
+      tags: [install_core]
+
+    - name: install extra packages
+      apt: name={{item}}
+      with_items: "{{extra_packages}}"
+      when: extra_packages is defined and extra_packages == "htop"
+
+
+
+
+
+
+
+
+

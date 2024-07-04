@@ -1,0 +1,86 @@
+
+Let us continue to improve our LAMP stack E-Commerce application. Now that we have learned about variables and jinja2 templates, let's put those to use.
+
+
+In the ~/playbooks/lamp-stack-playbooks/deploy-lamp-stack.yml playbook, we have the IP address of the lampweb host hard coded in Create Application DB User task. This is not a good idea as this IP could change in different environments. Update the task to use a variable to get the IP address of the lampweb host. Note that this task is running on the lamp-db server.
+
+
+
+
+
+
+cat inventory 
+[db_servers]
+lamp-db ansible_host=172.20.1.101 ansible_ssh_private_key_file=/home/thor/.ssh/maria ansible_user=maria mysqlservice=mysqld mysql_port=3306 dbname=ecomdb dbuser=ecomuser dbpassword=ecompassword
+
+[web_servers]
+lampweb ansible_host=172.20.1.100 ansible_ssh_private_key_file=/home/thor/.ssh/john ansible_user=john httpd_port=80 repository=https://github.com/kodekloudhub/learning-app-ecommerce.git
+
+
+
+
+- name: Deploy lamp stack application
+  hosts: lamp-db
+  become: yes
+  tasks:
+    - name: Install MariaDB package
+      yum:
+        name:
+          - mariadb-server
+          - MySQL-python
+        state: installed
+
+    - name: Create Mysql configuration file
+      copy: 
+        src: files/my.cnf 
+        dest: /etc/my.cnf
+
+    - name: Start MariaDB Service
+      service: 
+        name: mariadb 
+        state: started 
+        enabled: yes
+
+    - name: Ensure firewalld is running
+      service: 
+        name: firewalld 
+        state: started 
+        enabled: yes
+
+    - name: Insert firewalld rule for MySQL
+      firewalld: 
+        port: "{{ mysql_port }}/tcp" 
+        permanent: true 
+        state: enabled
+
+    - name: Create Application Database
+      mysql_db: 
+        name: "{{ dbname }}" 
+        state: present
+
+    - name: Create Application DB User
+      mysql_user: 
+        name: "{{ dbuser }}" 
+        password: "{{ dbpassword }}" 
+        priv: "*.*:ALL" 
+        host: "{{ ansible_host }}" 
+        state: present
+
+    - name: Move db-load-script to db host
+      copy:
+        src: files/db-load-script.sql
+        dest: /tmp/db-load-script.sql
+
+    - name: Load Inventory Data
+      shell: mysql -f < /tmp/db-load-script.sql
+
+
+We have few configuration files that use hard-coded values as well.
+
+
+The files/db-load-script.sql used to load data into the database, it has the database name hardcoded into it at the first line. Convert this file into a template and store it as db-load-script.sql.j2 in the templates folder. Modify the contents of the file to use the dbname variable instead of the hardcoded value.
+
+USE {{ dbname }};
+CREATE TABLE products (id mediumint(8) unsigned NOT NULL auto_increment,Name varchar(255) default NULL,Price varchar(255) default NULL, ImageUrl varchar(255) default NULL,PRIMARY KEY (id)) AUTO_INCREMENT=1;
+
+INSERT INTO products (Name,Price,ImageUrl) VALUES ("Laptop","100","c-1.png"),("Drone","200","c-2.png"),("VR","300","c-3.png"),("Tablet","50","c-5.png"),("Watch","90","c-6.png"),("Phone Covers","20","c-7.png"),("Phone","80","c-8.png"),("Laptop","150","c-4.png");

@@ -1,0 +1,87 @@
+Which of the following options can be used to ignore a particular failed task in a play?
+==> ignors_errors
+While running a playbook for multiple servers how can we force interrupt the entire play if a task fails for a single host?
+==> set any_errors_fatal to true
+We have a playbook at ~/playbooks/httpd.yml to install httpd web server on all web nodes. The inventory file at ~/playbooks/inventory has these web nodes added. Update playbook so that if any task fails for any of the web nodes the playbook should exit for all hosts.
+
+---
+- name: Install httpd
+  hosts: all
+  any_errors_fatal: true
+  gather_facts: no
+  tasks:
+    - name: Install httpd
+      yum:
+        name: httpd
+        state: present
+
+    - name: start service
+      service:
+        name: httpd
+        state: started
+A playbook at ~/playbooks/httpd_errors.yml runs tasks on web1 node only. However, there is a faulty task in it. We want to ignore the failed task so that the playbook can proceed to the next task. Make the appropriate changes inside the playbook to ignore the second task. Use inventory file ~/playbooks/inventory .
+
+
+Do not try to fix the failed task.
+
+---
+- name: Install httpd
+  hosts: web1
+  gather_facts: no
+  tasks:
+    - name: Install httpd
+      yum:
+        name: httpd
+        state: present
+
+    - name: Do not remove this task
+      command: /bin/false
+      register: results
+      ignore_errors: yes
+
+    - shell: "echo {{ results.msg }} > /tmp/output"
+
+    - name: start service
+      service:
+        name: httpd
+        state: started
+The playbook ~/playbooks/httpd_check_errors.yml installs httpd on web1 node, then checks for errors in the error log and then starts the httpd service.
+
+Our goal is for the playbook to fail if the error check (second task) detects errors in the log file. However, with the current playbook, the error check (second task) has no impact as it is only viewing the error log file. Update the playbook so that it fails if it detects a string Error in the file /var/log/httpd/error_log.
+
+
+The task is already there. Only implement error handling. Use ~/playbooks/inventory file to test the playbook that is already present on ansible controller.
+
+---
+- name: Install httpd
+  hosts: web1
+  gather_facts: no
+  tasks:
+    - name: Install httpd
+      yum:
+        name: httpd
+        state: present
+    - name: Check httpd error logs
+      command: cat /var/log/httpd/error_log
+      register: results
+
+    - name: start service
+      service:
+        name: httpd
+        state: started
+      failed_when: '"Error" in results.stdout'
+
+    - name: Create a file
+      file:
+        path: /tmp/file
+        state: touch
+
+
+ 
+
+
+
+
+
+
+

@@ -1,0 +1,477 @@
+Let us continue to improve our lamp stack project. Now that we have learned about roles, let's create re-usable roles and use them in our project.
+
+
+Start by creating 3 roles named common, httpd-php and mysql under the roles directory under your project at /home/thor/playbooks/lamp-stack-playbooks
+###### Create roles
+
+ansible-galaxy init roles/httpd-php
+ansible-galaxy init roles/common
+ansible-galaxy init roles/mysql
+Let's move the tasks from the tasks directory to the tasks/main.yml file inside each role.
+
+
+Do not modify the tasks or task names. Only move them to the respective files
+###### Move the tasks to the tasks/main.yml file inside each role.
+
+cp tasks/common.yml roles/common/tasks/main.yml
+cp tasks/db.yml roles/mysql/tasks/main.yml
+cp tasks/web.yml roles/httpd-php/tasks/main.yml
+cat tasks/web.yml 
+- name: Install httpd and php
+  yum:
+    name:
+      - httpd
+      - php
+      - php-mysql
+    state: present
+
+- name: Install web role specific dependencies
+  yum: name=git state=installed
+
+- name: Start firewalld
+  service: name=firewalld state=started enabled=yes
+
+- name: insert firewalld rule for httpd
+  firewalld: port={{ httpd_port }}/tcp permanent=true state=enabled immediate=yes
+
+- name: Set index.php as the default page
+  tags: "Set index.php as the default page"
+  replace:
+    path: /etc/httpd/conf/httpd.conf
+    regexp: 'DirectoryIndex index.html'
+    replace: 'DirectoryIndex index.php'
+
+- name: http service state
+  service: name=httpd state=started enabled=yes
+
+- name: Copy the code from repository
+  git: repo={{ repository }} dest=/var/www/html/  force=yes
+
+- name: Creates the index.php file
+  template: src=templates/index.php.j2 dest=/var/www/html/index.php[thor@ansible-controller lamp-stack-playbooks]$ cat tasks/db.yml 
+- name: Install MariaDB package
+  yum:
+    name:
+      - mariadb-server
+      - MySQL-python
+    state: installed
+
+- name: Create Mysql configuration file
+  template: src=templates/my.cnf.j2 dest=/etc/my.cnf
+
+- name: Start MariaDB Service
+  service: name=mariadb state=started enabled=yes
+
+- name: Start firewalld
+  service: name=firewalld state=started enabled=yes
+
+- name: insert firewalld rule
+  firewalld: port={{ mysql_port }}/tcp permanent=true state=enabled immediate=yes
+
+- name: Create Application Database
+  mysql_db: name={{ dbname }} state=present
+
+- name: Create Application DB User
+  mysql_user: name={{ dbuser }} password={{ dbpassword }} priv=*.*:ALL host='172.20.1.100' state=present
+
+- name: Move db-load-script to db host
+  template:
+    src: templates/db-load-script.sql.j2
+    dest: /tmp/db-load-script.sql
+
+- name: Load Inventory Data
+  shell: mysql -f < /tmp/db-load-script.sql[thor@ansible-controller lamp-stack-playbooks]$ cat 
+README.md              host_vars/             tasks/
+deploy-lamp-stack.yml  inventory              templates/
+group_vars/            roles/                 
+[thor@ansible-controller lamp-stack-playbooks]$ cat tasks/db.yml 
+- name: Install MariaDB package
+  yum:
+    name:
+      - mariadb-server
+      - MySQL-python
+    state: installed
+
+- name: Create Mysql configuration file
+  template: src=templates/my.cnf.j2 dest=/etc/my.cnf
+
+- name: Start MariaDB Service
+  service: name=mariadb state=started enabled=yes
+
+- name: Start firewalld
+  service: name=firewalld state=started enabled=yes
+
+- name: insert firewalld rule
+  firewalld: port={{ mysql_port }}/tcp permanent=true state=enabled immediate=yes
+
+- name: Create Application Database
+  mysql_db: name={{ dbname }} state=present
+
+- name: Create Application DB User
+  mysql_user: name={{ dbuser }} password={{ dbpassword }} priv=*.*:ALL host='172.20.1.100' state=present
+
+- name: Move db-load-script to db host
+  template:
+    src: templates/db-load-script.sql.j2
+    dest: /tmp/db-load-script.sql
+
+- name: Load Inventory Data
+  shell: mysql -f < /tmp/db-load-script.sql[thor@ansible-controller lamp-stack-playbooks]$ cat tasks/common.yml 
+- name: Install common dependencies
+  yum:
+    name:
+      - libselinux-python
+      - libsemanage-python
+      - firewalld
+cat tasks/web.yml 
+- name: Install httpd and php
+  yum:
+    name:
+      - httpd
+      - php
+      - php-mysql
+    state: present
+
+- name: Install web role specific dependencies
+  yum: name=git state=installed
+
+- name: Start firewalld
+  service: name=firewalld state=started enabled=yes
+
+- name: insert firewalld rule for httpd
+  firewalld: port={{ httpd_port }}/tcp permanent=true state=enabled immediate=yes
+
+- name: Set index.php as the default page
+  tags: "Set index.php as the default page"
+  replace:
+    path: /etc/httpd/conf/httpd.conf
+    regexp: 'DirectoryIndex index.html'
+    replace: 'DirectoryIndex index.php'
+
+- name: http service state
+  service: name=httpd state=started enabled=yes
+
+- name: Copy the code from repository
+  git: repo={{ repository }} dest=/var/www/html/  force=yes
+
+- name: Creates the index.php file
+  template: src=templates/index.php.j2 dest=/var/www/html/index.php[thor@ansible-controller lamp-stack-playbooks]$ cat tasks/db.yml 
+- name: Install MariaDB package
+  yum:
+    name:
+      - mariadb-server
+      - MySQL-python
+    state: installed
+
+- name: Create Mysql configuration file
+  template: src=templates/my.cnf.j2 dest=/etc/my.cnf
+
+- name: Start MariaDB Service
+  service: name=mariadb state=started enabled=yes
+
+- name: Start firewalld
+  service: name=firewalld state=started enabled=yes
+
+- name: insert firewalld rule
+  firewalld: port={{ mysql_port }}/tcp permanent=true state=enabled immediate=yes
+
+- name: Create Application Database
+  mysql_db: name={{ dbname }} state=present
+
+- name: Create Application DB User
+  mysql_user: name={{ dbuser }} password={{ dbpassword }} priv=*.*:ALL host='172.20.1.100' state=present
+
+- name: Move db-load-script to db host
+  template:
+    src: templates/db-load-script.sql.j2
+    dest: /tmp/db-load-script.sql
+
+- name: Load Inventory Data
+  shell: mysql -f < /tmp/db-load-script.sql[thor@ansible-controller lamp-stack-playbooks]$ cat 
+README.md              host_vars/             tasks/
+deploy-lamp-stack.yml  inventory              templates/
+group_vars/            roles/                 
+[thor@ansible-controller lamp-stack-playbooks]$ cat tasks/db.yml 
+- name: Install MariaDB package
+  yum:
+    name:
+      - mariadb-server
+      - MySQL-python
+    state: installed
+
+- name: Create Mysql configuration file
+  template: src=templates/my.cnf.j2 dest=/etc/my.cnf
+
+- name: Start MariaDB Service
+  service: name=mariadb state=started enabled=yes
+
+- name: Start firewalld
+  service: name=firewalld state=started enabled=yes
+
+- name: insert firewalld rule
+  firewalld: port={{ mysql_port }}/tcp permanent=true state=enabled immediate=yes
+
+- name: Create Application Database
+  mysql_db: name={{ dbname }} state=present
+
+- name: Create Application DB User
+  mysql_user: name={{ dbuser }} password={{ dbpassword }} priv=*.*:ALL host='172.20.1.100' state=present
+
+- name: Move db-load-script to db host
+  template:
+    src: templates/db-load-script.sql.j2
+    dest: /tmp/db-load-script.sql
+
+- name: Load Inventory Data
+  shell: mysql -f < /tmp/db-load-script.sql[thor@ansible-controller lamp-stack-playbooks]$ cat tasks/common.yml 
+- name: Install common dependencies
+  yum:
+    name:
+      - libselinux-python
+      - libsemanage-python
+      - firewalld
+cat tasks/web.yml 
+- name: Install httpd and php
+  yum:
+    name:
+      - httpd
+      - php
+      - php-mysql
+    state: present
+
+- name: Install web role specific dependencies
+  yum: name=git state=installed
+
+- name: Start firewalld
+  service: name=firewalld state=started enabled=yes
+
+- name: insert firewalld rule for httpd
+  firewalld: port={{ httpd_port }}/tcp permanent=true state=enabled immediate=yes
+
+- name: Set index.php as the default page
+  tags: "Set index.php as the default page"
+  replace:
+    path: /etc/httpd/conf/httpd.conf
+    regexp: 'DirectoryIndex index.html'
+    replace: 'DirectoryIndex index.php'
+
+- name: http service state
+  service: name=httpd state=started enabled=yes
+
+- name: Copy the code from repository
+  git: repo={{ repository }} dest=/var/www/html/  force=yes
+
+- name: Creates the index.php file
+  template: src=templates/index.php.j2 dest=/var/www/html/index.php[thor@ansible-controller lamp-stack-playbooks]$ cat tasks/db.yml 
+- name: Install MariaDB package
+  yum:
+    name:
+      - mariadb-server
+      - MySQL-python
+    state: installed
+
+- name: Create Mysql configuration file
+  template: src=templates/my.cnf.j2 dest=/etc/my.cnf
+
+- name: Start MariaDB Service
+  service: name=mariadb state=started enabled=yes
+
+- name: Start firewalld
+  service: name=firewalld state=started enabled=yes
+
+- name: insert firewalld rule
+  firewalld: port={{ mysql_port }}/tcp permanent=true state=enabled immediate=yes
+
+- name: Create Application Database
+  mysql_db: name={{ dbname }} state=present
+
+- name: Create Application DB User
+  mysql_user: name={{ dbuser }} password={{ dbpassword }} priv=*.*:ALL host='172.20.1.100' state=present
+
+- name: Move db-load-script to db host
+  template:
+    src: templates/db-load-script.sql.j2
+    dest: /tmp/db-load-script.sql
+
+- name: Load Inventory Data
+  shell: mysql -f < /tmp/db-load-script.sql[thor@ansible-controller lamp-stack-playbooks]$ cat 
+README.md              host_vars/             tasks/
+deploy-lamp-stack.yml  inventory              templates/
+group_vars/            roles/                 
+[thor@ansible-controller lamp-stack-playbooks]$ cat tasks/db.yml 
+- name: Install MariaDB package
+  yum:
+    name:
+      - mariadb-server
+      - MySQL-python
+    state: installed
+
+- name: Create Mysql configuration file
+  template: src=templates/my.cnf.j2 dest=/etc/my.cnf
+
+- name: Start MariaDB Service
+  service: name=mariadb state=started enabled=yes
+
+- name: Start firewalld
+  service: name=firewalld state=started enabled=yes
+
+- name: insert firewalld rule
+  firewalld: port={{ mysql_port }}/tcp permanent=true state=enabled immediate=yes
+
+- name: Create Application Database
+  mysql_db: name={{ dbname }} state=present
+
+- name: Create Application DB User
+  mysql_user: name={{ dbuser }} password={{ dbpassword }} priv=*.*:ALL host='172.20.1.100' state=present
+
+- name: Move db-load-script to db host
+  template:
+    src: templates/db-load-script.sql.j2
+    dest: /tmp/db-load-script.sql
+
+- name: Load Inventory Data
+  shell: mysql -f < /tmp/db-load-script.sql[thor@ansible-controller lamp-stack-playbooks]$ cat tasks/common.yml 
+- name: Install common dependencies
+  yum:
+    name:
+      - libselinux-python
+      - libsemanage-python
+      - firewalld
+cat tasks/web.yml 
+- name: Install httpd and php
+  yum:
+    name:
+      - httpd
+      - php
+      - php-mysql
+    state: present
+
+- name: Install web role specific dependencies
+  yum: name=git state=installed
+
+- name: Start firewalld
+  service: name=firewalld state=started enabled=yes
+
+- name: insert firewalld rule for httpd
+  firewalld: port={{ httpd_port }}/tcp permanent=true state=enabled immediate=yes
+
+- name: Set index.php as the default page
+  tags: "Set index.php as the default page"
+  replace:
+    path: /etc/httpd/conf/httpd.conf
+    regexp: 'DirectoryIndex index.html'
+    replace: 'DirectoryIndex index.php'
+
+- name: http service state
+  service: name=httpd state=started enabled=yes
+
+- name: Copy the code from repository
+  git: repo={{ repository }} dest=/var/www/html/  force=yes
+
+- name: Creates the index.php file
+  template: src=templates/index.php.j2 dest=/var/www/html/index.php[thor@ansible-controller lamp-stack-playbooks]$ cat tasks/db.yml 
+- name: Install MariaDB package
+  yum:
+    name:
+      - mariadb-server
+      - MySQL-python
+    state: installed
+
+- name: Create Mysql configuration file
+  template: src=templates/my.cnf.j2 dest=/etc/my.cnf
+
+- name: Start MariaDB Service
+  service: name=mariadb state=started enabled=yes
+
+- name: Start firewalld
+  service: name=firewalld state=started enabled=yes
+
+- name: insert firewalld rule
+  firewalld: port={{ mysql_port }}/tcp permanent=true state=enabled immediate=yes
+
+- name: Create Application Database
+  mysql_db: name={{ dbname }} state=present
+
+- name: Create Application DB User
+  mysql_user: name={{ dbuser }} password={{ dbpassword }} priv=*.*:ALL host='172.20.1.100' state=present
+
+- name: Move db-load-script to db host
+  template:
+    src: templates/db-load-script.sql.j2
+    dest: /tmp/db-load-script.sql
+
+- name: Load Inventory Data
+  shell: mysql -f < /tmp/db-load-script.sql[thor@ansible-controller lamp-stack-playbooks]$ cat 
+README.md              host_vars/             tasks/
+deploy-lamp-stack.yml  inventory              templates/
+group_vars/            roles/                 
+[thor@ansible-controller lamp-stack-playbooks]$ cat tasks/db.yml 
+- name: Install MariaDB package
+  yum:
+    name:
+      - mariadb-server
+      - MySQL-python
+    state: installed
+
+- name: Create Mysql configuration file
+  template: src=templates/my.cnf.j2 dest=/etc/my.cnf
+
+- name: Start MariaDB Service
+  service: name=mariadb state=started enabled=yes
+
+- name: Start firewalld
+  service: name=firewalld state=started enabled=yes
+
+- name: insert firewalld rule
+  firewalld: port={{ mysql_port }}/tcp permanent=true state=enabled immediate=yes
+
+- name: Create Application Database
+  mysql_db: name={{ dbname }} state=present
+
+- name: Create Application DB User
+  mysql_user: name={{ dbuser }} password={{ dbpassword }} priv=*.*:ALL host='172.20.1.100' state=present
+
+- name: Move db-load-script to db host
+  template:
+    src: templates/db-load-script.sql.j2
+    dest: /tmp/db-load-script.sql
+
+- name: Load Inventory Data
+  shell: mysql -f < /tmp/db-load-script.sql[thor@ansible-controller lamp-stack-playbooks]$ cat tasks/common.yml 
+- name: Install common dependencies
+  yum:
+    name:
+      - libselinux-python
+      - libsemanage-python
+      - firewalld
+If not done already, update the main playbook - deploy-lamp-stack.yml - to use the newly created roles.
+
+
+---
+
+- name: Deploy lamp stack application
+  hosts: all
+  become: yes
+  roles:
+    - common
+
+    # Install and Configure Database
+- name: Deploy lamp stack application
+  hosts: lamp-db
+  become: yes
+  roles:
+    - mysql
+
+- name: Deploy lamp stack application
+  hosts: lampweb
+  become: yes
+  roles:
+    - httpd-php
+If not done already you may optionally execute the playbook and wait to completion. Then view the application by clicking the Web App link at the top of your terminal.
+
+
+
+
+
+
+

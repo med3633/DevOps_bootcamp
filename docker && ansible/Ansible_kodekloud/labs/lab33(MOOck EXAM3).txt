@@ -1,0 +1,58 @@
+We have 2 managed nodes that are part of different DNS domains with a distinct DNS server for each. Using the sample resolv.conf located at ~/playbooks/dns, generate a new resolv.conf file and copy it to the respective nodes using the template module.
+
+
+Update the template file located at ~/playbooks/dns/templates/resolv.conf.j2 to print the nameserver details as shown in the sample_resolv.conf file. DNS server to be used is specified in the inventory file.
+Use this template to create a playbook called update_dns_server.yml. This playbook should generate the new resolv.conf and copy to the temp file /tmp/resolv.conf on the respective nodes .
+
+[thor@ansible-controller dns]$ cat sample_resolv.conf 
+nameserver 10.61.56.199
+options ndots:0
+[thor@ansible-controller dns]$ vi templates/resolv.conf.j2 
+[thor@ansible-controller dns]$ cat templates/resolv.conf.j2 
+nameserver  {{ dns_server }};
+options ndots:0
+
+[thor@ansible-controller dns]$ cat update_dns_server.yml 
+---
+- hosts: storage_nodes
+  tasks:
+  - name: copy resolv.conf to nodes
+    become: true
+    template:
+      src: /home/thor/playbooks/dns/templates/resolv.conf.j2
+      dest: /tmp/resolv.conf
+
+We have two nodes that are managed by Ansible. There is an inventory file ~/playbooks/inventory on Ansible controller which has all these two nodes added. Create a playbook ~/playbooks/blocks.yml on Ansible controller to install httpd web server and start its service.
+
+
+Create the playbook using blocks to logically group the tasks (installation and service start).
+---
+- hosts: all
+  gather_facts: no
+  tasks:
+    - name: Install the latest version of httpd
+      package:
+        name: httpd
+        state: latest
+
+    - name: Start and enable the httpd service
+      service:
+        name: httpd
+        state: started
+
+Using an Ansible playbook install firewalld on node00 node, start its service as well. Name the playbook as firewall.yml and keep it under ~/playbooksand also white list node01 host's IP address 172.20.1.101 on node00
+
+Use the following YAML file to create a playbook called firewall.yml as follows:-
+
+
+---
+- hosts: node00
+  tasks:
+   - yum: name=firewalld state=installed
+   - service: name=firewalld state=started
+   - firewalld:
+      source: 172.20.1.101
+      state: enabled
+      zone: internal
+      permanent: yes
+      immediate: yes

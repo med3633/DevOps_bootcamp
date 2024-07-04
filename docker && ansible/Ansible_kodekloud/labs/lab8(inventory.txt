@@ -1,0 +1,124 @@
+Let us explore the environment for our KodeKloud e-commerce LAMP stack application. There are 2 servers - lamp-web and lamp-db. Let us setup the inventory files for that. Create an inventory file at /home/thor/playbooks/lamp-stack-playbooks/inventory to include the following data:
+
+
+Hosts: lamp-web, lamp-db
+
+Groups: db_servers contains lamp-db; web_servers contains lamp-web
+
+IP Addresses: lamp-web: 172.20.1.100; lamp-db: 172.20.1.101
+
+Credentials for lamp-web: Username=john Password=john
+
+Credentials for lamp-db Username=maria Password=maria
+
+# Inventory File
+[web_servers]
+lamp-web ansible_host=172.20.1.100 ansible_user=john ansible_password=john
+
+[db_servers]
+lamp-db ansible_host=172.20.1.101 ansible_user=maria ansible_password=maria
+
+[all:vars]
+ansible_become=true
+
+Let's add some additional data required for setting up the database and web servers. The data should be associated with the respective servers.
+
+
+Database Info:
+
+mysqlservice=mysqld
+
+mysql_port=3306
+
+dbname=ecomdb
+
+dbuser=ecomuser
+
+dbpassword=ecompassword
+
+
+Web Info:
+
+httpd_port=80
+
+repository=https://github.com/kodekloudhub/learning-app-ecommerce.git
+
+[db_servers:vars]
+mysqlservice=mysqld
+mysql_port=3306
+dbname=ecomdb
+dbuser=ecomuser
+dbpassword=ecompassword
+
+[web_servers:vars]
+httpd_port=80
+repository=https://github.com/kodekloudhub/learning-app-ecommerce.git
+
+
+
+
+Let us setup password less authentication between Ansible Controller and the web/db servers.
+
+Create a pair of SSH keys for each user (without any passphrase) at /home/thor/.ssh/maria and /home/thor/.ssh/john
+
+And distribute the public keys to the web and database servers - lamp-db and lamp-web.
+
+
+DB server user is maria and its password is maria. Web server user is john and its password is john.
+
+
+
+
+
+
+
+# Generate SSH key for maria
+ssh-keygen -t rsa -b 2048 -f /home/thor/.ssh/maria -N ""
+
+# Generate SSH key for john
+ssh-keygen -t rsa -b 2048 -f /home/thor/.ssh/john -N ""
+
+# Copy public key for maria to lamp-db
+ssh-copy-id -i /home/thor/.ssh/maria.pub maria@172.20.1.101
+
+# Copy public key for john to lamp-web
+ssh-copy-id -i /home/thor/.ssh/john.pub john@172.20.1.100
+
+# Verify SSH for maria to lamp-db
+ssh -i /home/thor/.ssh/maria maria@172.20.1.101
+
+# Verify SSH for john to lamp-web
+ssh -i /home/thor/.ssh/john john@172.20.1.100
+
+Update the inventory file to use the newly created private keys for the respective hosts
+
+[db_servers]
+lamp-db ansible_host=172.20.1.101 ansible_user=maria ansible_ssh_private_key_file=/home/thor/.ssh/maria mysqlservice=mysqld mysql_port=3306 dbname=ecomdb dbuser=ecomuser dbpassword=ecompassword
+
+[web_servers]
+lamp-web ansible_host=172.20.1.100 ansible_user=john ansible_ssh_private_key_file=/home/thor/.ssh/john httpd_port=80 repository=https://github.com/kodekloudhub/learning-app-ecommerce.git
+
+A playbook deploy-lamp-stack.yml is given with a basic tasks to install basic libraries. Execute the playbook and fix any issues.
+
+
+You are not required to add any tasks or plays. Only fix the issue with execution.
+
+
+
+
+- name: Deploy lamp stack application
+  hosts: all
+  become: yes  # Enable privilege escalation
+  tasks:
+    - name: Install common dependencies
+      yum:
+        name:
+          - libselinux-python
+          - libsemanage-python
+          - firewalld
+        state: installed
+
+because  show this erreur 
+fatal: [lamp-web]: FAILED! => {"changed": false, "msg": "ovl: Error while doing RPMdb copy-up:\n[Errno 13] Permission denied: '/var/lib/rpm/Sigmd5'\nYou need to be root to perform this command.\n", "rc": 1, "results": ["Loaded plugins: fastestmirror, ovl\n"]}
+fatal: [lamp-db]: FAILED! => {"changed": false, "msg": "ovl: Error while doing RPMdb copy-up:\n[Errno 13] Permission denied: '/var/lib/rpm/Sigmd5'\nYou need to be root to perform this command.\n", "rc": 1, "results": ["Loaded plugins: fastestmirror, ovl\n"]}
+

@@ -1,0 +1,143 @@
+A cli tool called awscli has been installed using pip3, and its out of date on remote servers. Ensure that it is updated to the latest version.
+
+
+Write a playbook /home/thor/playbooks/update_version.yml to update aws cli to the latest version. Use inventory /home/thor/playbooks/inventory
+[thor@ansible-controller playbooks]$ cat update_version.yml 
+---
+- hosts: all
+  gather_facts: no
+  tasks:
+    - pip:
+        name: awscli
+        state: latest
+        executable: pip3
+[thor@ansible-controller playbooks]$ cat in
+index.html  inventory   
+[thor@ansible-controller playbooks]$ cat inventory 
+node00 ansible_host=172.20.1.100 ansible_ssh_pass=Passw0rd ansible_user=root
+node01 ansible_host=172.20.1.101 ansible_ssh_pass=Passw0rd ansible_user=root
+
+A new developer called "John Doe" is recently hired in your team. He needs to get inside all the remote servers via ssh as root user.
+
+
+Write a playbook /home/thor/playbooks/give_ssh_access.yml to give ssh access on all the remote servers by pushing his public key: /home/thor/playbooks/john_doe.pub on all of them.
+
+List of all servers is listed in the inventory /home/thor/playbooks/inventory
+
+###### Create give_ssh_access.yml playbook and add below given code
+
+---
+- hosts: all
+  gather_facts: no
+  tasks:
+    - authorized_key:
+        user: root
+        key: "{{ lookup('file', 'john_doe.pub') }}"
+        state: present
+
+cat john_doe.pub 
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDKwkxOX/oL32mrquYMUJtfoSo2Cr84prfFGFMd5rkhxcNvoCYAikX5aKwcYYoVCWwfRuMigPfq0aKfSpiw7K75SBMtFPj7qLYCUqRl+H8+UcG91rYk5PwTJBtJUnEaZBj4ns/fMAOnNHvtZh4svHe/n7J9UGWsQNSpgMfxBS3RBCVAYSHkn153yrBZw1iZ/TdcB4bPbPQOheAWdi5JKmSfrbw46MCwGxjDyawNErIV+Uy+I7+c+ZLt6NGddh1HEJlR0wHgllCVMWquxKd3unVEKLY88+65lwkenUl56ZBs25qvPbLVtpq52c2mlMRdiGiBw9+lTsl46mZion9oRy85P4uKKcW2NNbrVc6FdpeNa+eSbLupgb9RaEJJi/iym9ULZAx4W9wPCIwY1AeM6QIPiNpWt8sNOUm4CbHi2kg9QjeBI3ZArY93w3ZLnu9CPB5g+/YVFgqIFR4ysEn4qxtEZUAOYkgKKs3FG4Xd+iyjytZB8YGe9gir5AYdy7mH800= John Doe
+
+authorized_key: This is an Ansible module used to manage SSH authorized keys for users.
+user: root: This specifies that the key should be added to the root user's ~/.ssh/authorized_keys file.
+key: "{{ lookup('file', 'john_doe.pub') }}": This line uses the lookup function to read the contents of the john_doe.pub file, which contains the public SSH key. The file lookup plugin reads the file and returns its contents as a string. This string is then used as the value for the key parameter.
+state: present: This ensures that the key is present in the authorized_keys file. If the key is not already there, it will be added.
+==> The purpose of this playbook is to automate the process of distributing SSH keys to multiple hosts. This is especially useful for granting access to a new user across a fleet of servers without manually copying the SSH key to each server.
+
+Write a playbook /home/thor/playbooks/configure_webserver.yml which installs nginx web server and serves a html file: index.html from directory /usr/share/nginx/html on remote servers.
+
+
+You are provided with /home/thor/playbooks/index.html that you should copy to remote web servers listed on inventory /home/thor/playbooks/inventory. Ensure that nginx is serving the file, that you copied.
+
+
+
+
+Syntax
+
+###### Create configure_webserver.yml playbook and add below given code
+
+---
+- hosts: all
+  tasks:
+    - package:
+        name: nginx
+        state: present
+    - copy:
+        src: index.html
+        dest: /usr/share/nginx/html/index.html
+    - service:
+        name: nginx
+        state: started
+
+[thor@ansible-controller playbooks]$ cat index.html 
+you nailed it, right !!
+
+Write a playbook to copy the secret file located at /home/thor/playbooks/secret_file.txt to all remote hosts at location: /root/.secret_file.txt
+
+
+Your playbook must be located at: /home/thor/playbooks/copy_secrets.yml
+
+Use inventory file: /home/thor/playbooks/inventory. The secret file is encrypted, please use the vault password from the script /home/thor/playbooks/get_vault_pass.py while you execute the playbook.
+
+###### Create copy_secrets.yml playbook and add below given code
+
+---
+
+- hosts: all
+  tasks:
+    - name: copy a secret file to remote hosts
+      copy:
+        src: secret_file.txt
+        dest: /root/.secret_file.txt
+
+playbooks]$ cat secret_file.txt 
+$ANSIBLE_VAULT;1.1;AES256
+36356263323361383133663063646437383137333761323036313538373764646662316666626433
+3632333032656539303962376439323830663933393333610a353037393033636361353931343938
+66613934383261306139316365303633313638636435326430356362653266613565343561646639
+3239633131386337630a396435383361353464633836613634316234313034653764333934363762
+36626663363134346430633162363237346338363565373936323232383137303432393834393732
+6464383734396164313735643936383432636338643135653638
+
+ansible-playbook -i ~/playbooks/inventory copy_secrets.yml --vault-password-file get_vault_pass.py 
+[thor@ansible-controller playbooks]$ cat get_vault_pass.py 
+#!/usr/bin/python
+
+from __future__ import print_function
+
+def get_secret():
+    # complex process to retive secrets...
+    secret='vaulty_pass'
+    print(secret, end='')
+
+get_secret()
+
+It is a recommended practice to apply the security updates on the system in periodic intervals.
+
+
+Write a playbook /home/thor/playbooks/patch_system.yml to ensure servers listed in /home/thor/playbooks/inventory are up to date with periodic security updates.
+
+######In CentOS, ensure the playboook installs and configures the yum-cron package to fit the need.
+_Confiure the yum-cron config file: /etc/yum/yum-cron.conf as update_cmd = security, to auto-update security packages and ensure yum-cron service is restarted afterwards._
+
+###### Create patch_system.yml playbook and add below given code
+
+---
+- hosts: all
+  tasks:
+    - package:
+        name: yum-cron
+        state: present
+    - lineinfile:
+        path: /etc/yum/yum-cron.conf
+        regexp: "^update_cmd"
+        line: "update_cmd = security"
+    - service:
+        name: yum-cron
+        state: restarted
+
+
+
+
+
+

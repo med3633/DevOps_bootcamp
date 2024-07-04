@@ -1,0 +1,83 @@
+Develop a jinja2 expression to print the given words in a new line.
+
+Use Jina2 Blocks
+{% for name in names -%}
+{{ name }}
+{% endfor %}
+Develop a jinja2 expression to generate a resolv.conf file using the given name server details.
+
+Use Jina2 Blocks
+src data 
+{
+  "name_servers": [
+    "10.1.1.5",
+    "10.1.1.6",
+    "10.1.1.8",
+    "10.8.8.1",
+    "8.8.8.8"
+  ]
+}
+{% for name_server in name_servers -%}
+nameserver {{ name_server }}
+{% endfor %}
+
+Develop a jinja2 expression to generate an /etc/hosts file using the given information.
+
+Use Jina2 Blocks
+
+src data 
+{
+  "hosts": [
+    {
+      "name": "web1",
+      "ip_address": "192.168.5.4"
+    },
+    {
+      "name": "web2",
+      "ip_address": "192.168.5.5"
+    },
+    {
+      "name": "web3",
+      "ip_address": "192.168.5.8"
+    },
+    {
+      "name": "db1",
+      "ip_address": "192.168.5.9"
+    }
+  ]
+}
+{% for host in hosts -%}
+{{ host.name }} {{ host.ip_address }}
+{% endfor %}
+
+Update the jinja2 expression to use an if block to update /etc/hosts file only if the hostname contains web.
+
+Use Jina2 Blocks
+
+src data 
+{
+  "hosts": [
+    {
+      "name": "web1",
+      "ip_address": "192.168.5.4"
+    },
+    {
+      "name": "web2",
+      "ip_address": "192.168.5.5"
+    },
+    {
+      "name": "web3",
+      "ip_address": "192.168.5.8"
+    },
+    {
+      "name": "db1",
+      "ip_address": "192.168.5.9"
+    }
+  ]
+}
+
+{% for host in hosts -%}
+  {% if "web" in host.name -%}
+{{ host.name }} {{ host.ip_address -}}
+  {% endif %}
+{% endfor %}

@@ -1,0 +1,62 @@
+Which of the following is the valid syntax to create new encrypted data file:
+==> ansible-vault create foo.yml
+What is the default cipher used by ansible-vault ?
+==> AES256
+Which of these sub-commands is used with ansible-vault if you wish to change your password for a vault-encrypted file/files ?
+==> rekey
+Using the ansible vault password file located at /home/thor/playbooks/vault_pass.txt, decrypt the file located at /home/thor/playbooks/decrypt_me.yml
+cat decrypt_me.yml 
+$ANSIBLE_VAULT;1.1;AES256
+36376634626565343564313733323162616564383138336232626239323930636364623636643636
+6535333261383465346137656236366133383136303634660a383364316566356534333736633231
+66356235653362343362323638303035633739303237363138646131666663343764366637646638
+3130323931326437650a333262386538343739666434313034343935376164656563303865316562
+64316634613462343163646463613838366563333561636666643439353238663437373762643232
+3239633463363262656464356432666637616465363866653438
+[thor@ansible-controller playbooks]$ ansible-vault decrypt /home/thor/playbooks/decrypt_me.yml --vault-password-file /home/thor/playbooks/vault_pass.txt
+Decryption successful
+cat vault_pass.txt 
+AN$1Bl3_V@u7t_i$_AWEs0m3
+Write a playbook to copy the secret file located at /home/thor/playbooks/secrets_file.txt to all remote hosts at location /root/.secrets_file.txt
+
+Your playbook must be located at: /home/thor/playbooks/copy_secrets.yml
+Remote hosts are placed in inventory: /home/thor/playbooks/inventory
+The secret file is encrypted, please use vault password from /home/thor/playbooks/vault_pass.txt while you execute the playbook.
+~/playbooks/copy_secrets.yml:
+
+---
+
+- hosts: all
+  tasks:
+    - name: copy a secret file to remote hosts
+      copy:
+        src: secrets_file.txt
+        dest: /root/.secrets_file.txt
+
+cat secrets_file.txt 
+$ANSIBLE_VAULT;1.1;AES256
+39633665643332303935633666626635653665666237353330333366396461626463343961653362
+6662393331383635343830383638636231653731303538380a393331613436353265383935356636
+34636332623938343537386331356532376539633861616134643563633333366130663439356361
+3530303663663461360a376335363738626632366262663934343933333563653736633365383961
+66366237663164643238656536313036333533343034366232306133316330383663323436653236
+37396531393530373133333161373734336235666534656461653061636133636461386165346339
+353461356663353533373161616231616139
+ playbooks]$ cat /etc/ansible/ansible.cfg 
+# config file for ansible -- https://ansible.com/
+# ===============================================
+
+# nearly all parameters can be overridden in ansible-playbook
+# or with command line flags. ansible will read ANSIBLE_CONFIG,
+# ansible.cfg in the current working directory, .ansible.cfg in
+# the home directory or /etc/ansible/ansible.cfg, whichever it
+# finds first
+
+[defaults]
+
+# some basic default values...
+vault_password_file = /home/thor/playbooks/vault_pass.txt
+thor@ansible-controller playbooks]$ sudo chmod 640 vault_pass.txt 
+[thor@ansible-controller playbooks]$ cat vault_pass.txt 
+AN$1Bl3_V@u7t_i$_AWEs0m3
+

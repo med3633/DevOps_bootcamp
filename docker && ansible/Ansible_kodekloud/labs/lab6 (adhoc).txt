@@ -1,0 +1,22 @@
+Run the ansible command to gather facts of the localhost and save the output in /tmp/ansible_facts.txt file.
+
+ ansible localhost -m setup | tee /tmp/ansible_facts.txt
+
+Run an adhoc command to perform a ping connectivity to all hosts in the /home/thor/playbooks/inventory file and save the output in /tmp/ansible_all.txt file.
+
+[thor@ansible-controller playbooks]$ ansible all -i /home/thor/playbooks/inventory -m ping | tee /tmp/ansible_all.txt
+web1 | SUCCESS => {
+    "changed": false, 
+    "ping": "pong"
+}
+web2 | SUCCESS => {
+    "changed": false, 
+    "ping": "pong"
+}
+
+Run an adhoc command to run a command on host web1 to print the date and save the output in /tmp/ansible_date.txt file on the ansible controller.
+
+
+Use the command module and argument date. Inventory file is available at /home/thor/playbooks/.
+
+[thor@ansible-controller playbooks]$ ansible web1 -i /home/thor/playbooks/inventory -m command -a "date" | tee /tmp/ansible_date.txt

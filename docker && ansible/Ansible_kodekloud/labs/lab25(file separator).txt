@@ -1,0 +1,163 @@
+We have an inventory file defined in the /home/thor/playbooks/web-playbooks directory. Move all host variables into a file for each of the server under a host_vars directory
+
+
+The inventory file is located at /home/thor/playbooks/web-playbooks/inventory. You may edit its contents but not its filename or location
+##cat inventory 
+[web_servers]
+web1 ansible_host=172.20.1.100 dns_server=8.8.8.8 size=big
+web2 ansible_host=172.20.1.101 dns_server=8.8.8.8 size=small
+Follow below given steps:
+
+cd playbooks/web-playbooks/
+mkdir host_vars
+Create vars file for web1
+
+vi host_vars/web1.yml
+Add below given content
+
+ansible_host: 172.20.1.100
+dns_server: 8.8.8.8
+size: big
+Create vars file for web2
+
+vi host_vars/web2.yml
+Add below given content
+
+ansible_host: 172.20.1.101
+dns_server: 8.8.8.8
+size: small
+Remove all vars from the inventory file
+inventory should look like
+
+[web_servers]
+web1
+web2
+The dns_server details are common to both servers. Move it to a separate variable file under group_vars (create if doesn't exist) and remove from host_vars.
+Follow below given steps:
+
+cd playbooks/web-playbooks/
+mkdir group_vars
+Create group vars file
+
+vi group_vars/web_servers.yml
+Add below given content
+
+dns_server: 8.8.8.8
+Remove the dns_server var from the hosts var files i.e web1.yml and web2.yml
+
+web1.yml should look like
+
+ansible_host: 172.20.1.100
+size: big
+web2.yml should look like
+
+ansible_host: 172.20.1.101
+size: small
+We have a playbook playbook.yml, inventory and other data in /home/thor/playbooks/db-playbooks directory. When we run the playbook it should print the value of the ntp_server configured on the db servers. However right now it says VARIABLE IS NOT DEFINED. Identify and fix the issue.
+cat db.yml 
+ntp_server: 192.168.1.10[thor@ansible-controller group_vars]$ cat ../inventory 
+[db_servers]
+db1
+db2
+##solution
+==> mv db.yml db_servers.yml
+We have some additional inventory data about database stored at /home/thor/playbooks/general/common/db/db.yml
+
+
+Include this in the playbook playbook-2.yml. We are trying to print the db_version.
+##cat db.yml 
+db_kind: mysql
+db_version: 8.0.17
+db_name: student
+##solution
+---
+- name: Print DB server data
+  hosts: all
+  gather_facts: no
+  tasks:
+    - include_vars: /home/thor/playbooks/general/common/db/db.yml
+    - debug:
+        var: db_version
+
+We must now install and configure db and web server packages on 2 servers. Some playbooks and task files have been created in the /home/thor/playbooks/full-stack-playbooks directory.
+
+
+Finish the playbook.yml to include the tasks in the tasks directory.
+##cat tasks/install-db-server.yml 
+- name: 556847-Install dependencies
+  yum:
+    enablerepo: extras
+    name:
+      - epel-release
+    state: installed
+
+- name: 556847-Install dependencies
+  yum:
+    name:
+      - python-pip
+    state: installed
+
+- name: Install MySQL database
+  yum:
+    name:
+      - mysql-server
+      - MySQL-python
+    state:  installed
+
+- name: Start Mysql Service
+  service:
+    name: mysqld
+    state: started
+    enabled: yes
+
+- name: Create Application Database
+  mysql_db: name='employee_db' state=present
+
+- name: Create Application DB User
+  # For web and db on the same server
+  mysql_user: name='db_user' password='Passw0rd' priv='*.*:ALL' host='localhost' state='present'
+  # For web and db on the different server
+  # mysql_user: name='db_user' password='Passw0rd' priv='*.*:ALL' host='%' state='present'
+##cat tasks/install-db-server.yml 
+- name: 556847-Install dependencies
+  yum:
+    enablerepo: extras
+    name:
+      - epel-release
+    state: installed
+
+- name: 556847-Install dependencies
+  yum:
+    name:
+      - python-pip
+    state: installed
+
+- name: Install MySQL database
+  yum:
+    name:
+      - mysql-server
+      - MySQL-python
+    state:  installed
+
+- name: Start Mysql Service
+  service:
+    name: mysqld
+    state: started
+    enabled: yes
+
+- name: Create Application Database
+  mysql_db: name='employee_db' state=present
+
+- name: Create Application DB User
+  # For web and db on the same server
+  mysql_user: name='db_user' password='Passw0rd' priv='*.*:ALL' host='localhost' state='present'
+  # For web and db on the different server
+  # mysql_user: name='db_user' password='Passw0rd' priv='*.*:ALL' host='%' state='present'
+##solution
+---
+- name: Configure full stack server
+  hosts: f-server-1
+  gather_facts: no
+  tasks:
+    - include_tasks: tasks/install-db-server.yml
+    - include_tasks: tasks/install-web-server.yml

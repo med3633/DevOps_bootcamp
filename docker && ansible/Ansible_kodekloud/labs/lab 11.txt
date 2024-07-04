@@ -1,0 +1,113 @@
+Create a playbook ~/playbooks/perm.yml to create a blank file /opt/data/perm.txt with 0640 permissions on web1 node.
+
+---
+- hosts: web1
+  become: yes
+  tasks:
+    - name: Create /opt/data directory if it doesn't exist
+      file:
+        path: /opt/data
+        state: directory
+        mode: '0755'  # Ensure directory has appropriate permissions
+
+    - name: Create blank file /opt/data/perm.txt
+      file:
+        path: /opt/data/perm.txt
+        state: touch
+        mode: '0640'  # Set file permissions to 0640 (rw-r-----)
+
+
+Using a playbook ~/playbooks/index1.yml create /var/www/html/index.html file on web1 node with content This line was added using Ansible lineinfile module!
+---
+- hosts: web1
+  become: yes
+  tasks:
+    - name: Ensure /var/www/html directory exists
+      file:
+        path: /var/www/html
+        state: directory
+        mode: '0755'
+
+    - name: Add content to /var/www/html/index.html
+      lineinfile:
+        path: /var/www/html/index.html
+        line: 'This line was added using Ansible lineinfile module!'
+        create: yes
+
+
+We have a playbook ~/playbooks/find.yml that recursively finds files in /opt/data directory older than 2 minutes and equal or greater than 1 megabyte in size. It also copies those files under /opt directory. However it has some missing parameters so its not working as expected, take a look into it and make appropriate changes.
+
+---
+- hosts: localhost
+  tasks:
+    - name: Find files older than 2 minutes and >= 1MB in size
+      find:
+        paths: /opt/data
+        age: 2m
+        size: 1M   # Specify size directly as 1M for 1 megabyte
+      register: found_files
+
+    - name: Copy found files to /opt directory
+      copy:
+        src: "{{ item.path }}"
+        dest: /opt/
+      with_items: "{{ found_files.files }}"
+
+In /var/www/html/index.html file on web1 node add some additional content using blockinfile module. Below is the content:
+
+Welcome to KodeKloud!
+This is Ansible Lab.
+
+
+Make sure user owner and group owner of the file is apache, also make sure the block is added at beginning of the file. Create a new playbook for this ~/playbooks/index2.yml
+
+
+---
+- hosts: web1
+  become: yes
+  tasks:
+    - name: Ensure /var/www/html directory exists
+      file:
+        path: /var/www/html
+        state: directory
+        owner: apache
+        group: apache
+        mode: '0755'
+
+    - name: Add content to /var/www/html/index.html at the beginning
+      blockinfile:
+        path: /var/www/html/index.html
+        block: |
+          Welcome to KodeKloud!
+          This is Ansible Lab.
+
+        insertbefore: BOF  # Insert at the beginning of the file
+        marker: "# {mark} ANSIBLE MANAGED BLOCK"
+
+    - name: Set owner and group for /var/www/html/index.html
+      file:
+        path: /var/www/html/index.html
+        owner: apache
+        group: apache
+
+On web1 node we want to run our httpd server on port 8080. Create a playbook ~/playbooks/httpd.yml to change port 80 to 8080 in /etc/httpd/conf/httpd.conf file using replace module. Also make sure Ansible restarts httpd service after making the change.
+
+
+Listen 80 is the parameter that need to be changed in /etc/httpd/conf/httpd.conf
+
+---
+- hosts: web1
+  become: yes
+  tasks:
+    - name: Change HTTPD server port to 8080 in httpd.conf
+      replace:
+        path: /etc/httpd/conf/httpd.conf
+        regexp: '^Listen 80'
+        replace: 'Listen 8080'
+      notify: restart httpd
+
+  handlers:
+    - name: restart httpd
+      service:
+        name: httpd
+        state: restarted

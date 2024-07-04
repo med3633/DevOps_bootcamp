@@ -1,0 +1,66 @@
+How do we do logical grouping of the tasks in Ansible?
+==> using bloks
+Which of the following is useful for error handling in Ansible blocks?
+==> rescue
+We have three web nodes that are managed by Ansible. There is an inventory file ~/playbooks/inventory on Ansible controller which has all these three nodes added. Create a playbook ~/playbooks/blocks.yml on Ansible controller to install httpd web server and start its service. We need the tasks to be run only on CentOS based web nodes.
+
+
+Create the playbook using blocks to logically group the tasks (installation and service start) so that even if we run playbook for all hosts that are in inventory, the tasks are run only on CentOS based nodes.
+
+---
+- hosts: all
+  tasks:
+    - name: Install and configure httpd web server
+      when: ansible_facts['distribution'] == 'CentOS'
+      block:
+        - yum:
+            name: httpd
+            state: present
+        - service:
+            name: httpd
+            state: started
+
+Make a copy of the playbook you just created - ~/playbooks/blocks.yml to ~/playbooks/blocks_rescue.yml. Update the new playbook as per below details:
+
+
+a. Add a rescue section under the block so that if the task fails for any of the managed node the rescue section should display a message in the form:
+
+Playbook has failed for web3 node
+Use {{ inventory_hostname}} in place of web3 so that correct value can be picked for each node
+
+---
+- hosts: all
+  tasks:
+    - name: Install and configure httpd web server
+      when: ansible_facts['distribution'] == 'CentOS'
+      block:
+        - yum:
+            name: httpd
+            state: present
+        - service:
+            name: httpd
+            state: started
+      rescue:
+        - debug:
+            msg: "Playbook has failed for {{ inventory_hostname }} node"
+
+We just created a new playbook at ~/playbooks/blocks_always.yml. This playbook creates a file on all web nodes and performs some tasks on them. The last task that prints This task always runs! must always run. However, the playbook fails at the second task and as a result the third and fourth task does not run. We do not need to fix the second task for now, but by using always section we want the last task to always run regardless of status of other tasks before it.
+
+
+Add an always section and configure the last task to always run. Do not modify any other task.
+
+---
+- hosts: all
+  tasks:
+    - name: Create a file
+      block:
+        - file:
+            path: /tmp/file.txt
+            state: touch
+        - name: This will fail
+          command: /bin/false
+        - debug:
+            msg: "This will never run"
+      always:
+        - debug:
+            msg: "This task always runs!"

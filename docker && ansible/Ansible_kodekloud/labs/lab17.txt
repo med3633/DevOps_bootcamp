@@ -1,0 +1,53 @@
+Develop a Jinja2 Expression to use the variable `name` that generates the expected output.
+src data 
+{
+  "name": "Bond"
+}
+the answer 
+The name is {{name}}
+
+Update the jinja2 expression to display the `name` in UPPERCASE
+The name is {{ name | upper}}
+Update the jinja2 expression to display the `book_name` in title case
+
+src data 
+{
+  "book_name": "Title of books are usually title cased"
+}
+the answer 
+{{ book_name| title}}
+
+Update the jinja2 expression to display the correct name in the `dialogue`
+
+`Replace` the wrong name with the right name
+
+{{ dialogue | replace('Bourne', 'Bond')}}
+
+{{ numbers | max}}
+
+Use a Jinja2 expression to display the last number in the given array
+
+Your
+{{ numbers | last}}
+You are given an array of words. Use a Jinja2 expression to join them to form a single sentence.
+
+src data: 
+{
+  "words": [
+    "we",
+    "are",
+    "meant",
+    "to",
+    "be",
+    "together"
+  ]
+}
+
+{{ words | join(' ')}}
+
+
+That was actually a movie name. Make sure its shown in title case.
+{{ words | join(' ') | title }}
+
+Use a Jinja2 expression to count the number of words.
+{{ words | wordcount }}

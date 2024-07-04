@@ -1,0 +1,176 @@
+Using an Ansible playbook install firewalld on web1 node, start and enable its service as well. Name the playbook as firewall.yml and keep it under ~/playbooks.
+
+---
+- name: Install and configure Firewalld
+  hosts: web1  # Replace with your actual host or group name
+
+  tasks:
+    - name: Install Firewalld
+      yum:
+        name: firewalld
+        state: present
+      become: yes
+
+    - name: Start Firewalld service
+      service:
+        name: firewalld
+        state: started
+        enabled: yes
+      become: yes
+
+We have a requirement on web1 node to white list web2 node's IP address 172.20.1.101 in firewall. Create and run a playbook ~/playbooks/whitelist.yml to do so.
+
+
+Add IP in internal zone.
+
+---
+- name: Whitelist IP in Firewalld
+  hosts: web1
+
+  tasks:
+    - name: Add IP to Firewalld zone
+      firewalld:
+        zone: internal
+        source: 172.20.1.101
+        state: present
+        permanent: true  # Ensure the change is permanent
+      become: yes
+
+We want to block 161/udp port on web1 node permanently. Make a playbook block.yml under ~/playbooks/ directory to do so.
+
+
+Use zone: block
+
+---
+- hosts: web1
+  become: yes
+  tasks:
+    - name: Ensure firewalld is installed
+      yum:
+        name: firewalld
+        state: present
+
+    - name: Start and enable firewalld
+      systemd:
+        name: firewalld
+        state: started
+        enabled: yes
+
+    - name: Create 'block' zone if it does not exist
+      firewalld:
+        zone: block
+        permanent: yes
+        state: present
+
+    - name: Block port 161/udp permanently in 'block' zone
+      firewalld:
+        port: 161/udp
+        zone: block
+        state: disabled
+        permanent: yes
+
+    - name: Reload firewalld to apply changes
+      command: firewall-cmd --reload
+
+On web1 node add firewall rule in internal zone to enable https connection from Ansible controller machine and make sure that rule must persist even after system reboot. You can create a playbook https.yml under ~/playbooks/ directory.
+
+
+IP address of ansible controller is 172.20.1.2.
+
+---
+- hosts: web1
+  become: yes
+  tasks:
+    - name: Ensure firewalld is installed
+      yum:
+        name: firewalld
+        state: present
+
+    - name: Start and enable firewalld
+      systemd:
+        name: firewalld
+        state: started
+        enabled: yes
+
+    - name: Allow HTTPS from Ansible controller in internal zone
+      firewalld:
+        zone: internal
+        rich_rule: 'rule family="ipv4" source address="172.20.1.2" port port="443" protocol="tcp" accept'
+        permanent: yes
+        state: enabled
+
+    - name: Reload firewalld to apply changes
+      command: firewall-cmd --reload
+
+We have a playbook ~/playbooks/web2-config.yml, it has some existing code to change apache’s default port 80 to port 8082 as we want to run Apache on port 8082 on web2 node. Make some changes as given below before running the playbook.
+
+
+A. Add an entry in ~/playbooks/inventory for web2 node, IP address of web2 node is 172.20.1.101 and ssh password and username are same as of web1 (username = root and password = Passw0rd).
+
+B. Update web2-config.yml to install httpd before updating its port in config, also start/enable its service.
+
+C. Install firewalld package and start/enable its service.
+
+D. As now Apache will listen on port 8082 so edit the playbook to add firewall rule in public zone so that Apache can allow all incoming traffic.
+
+
+inventory  
+[web1]
+172.20.1.100 ansible_ssh_user=root ansible_ssh_pass=Passw0rd
+
+[web2]
+172.20.1.101 ansible_ssh_user=root ansible_ssh_pass=Passw0rd
+to check
+ansible -i ~/playbooks/inventory all -m ping
+
+web2-config.yml
+---
+- hosts: web2
+  become: yes
+  tasks:
+    - name: Install httpd package
+      yum:
+        name: httpd
+        state: present
+
+    - name: Start and enable httpd service
+      systemd:
+        name: httpd
+        state: started
+        enabled: yes
+
+    - name: Install firewalld package
+      yum:
+        name: firewalld
+        state: present
+
+    - name: Start and enable firewalld service
+      systemd:
+        name: firewalld
+        state: started
+        enabled: yes
+
+    - name: Change Apache port to 8082
+      replace:
+        path: /etc/httpd/conf/httpd.conf
+        regexp: '^Listen 80'
+        replace: 'Listen 8082'
+      notify: Restart httpd
+
+    - name: Allow traffic on port 8082 in public zone
+      firewalld:
+        port: 8082/tcp
+        zone: public
+        permanent: yes
+        state: enabled
+
+    - name: Reload firewalld to apply changes
+      command: firewall-cmd --reload
+
+  handlers:
+    - name: Restart httpd
+      systemd:
+        name: httpd
+        state: restarted
+
+

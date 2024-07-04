@@ -1,0 +1,121 @@
+A register variable is created when we:
+
+How do we print the results, a command is returning?
+-v
+Which of the following keywords is used to create a registered variable?
+register
+The registered variable is stored in:
+memory
+We need to find the uptime of remote hosts. Out of the following options, which one would print the uptime in your playbook?
+
+A sample playbook is provided to you to answer this question.
+It is located at /home/thor/playbooks/uptime.yml and your remote hosts are listed in the inventory file: /home/thor/playbooks/inventory.
+
+Using options below, make changes to the playbook and run the playbook: ansible-playbook -i inventory uptime.yml, and find the uptime.
+
+- hosts: all
+  tasks:
+     - shell: uptime
+       register: uptime_result
+
+     # one of the following option is a correct answer:
+     # - debug: var=uptime_result.output
+     # - debug: msg=uptime_result.stdout
+     # - debug: msg=uptime_result.stdout    
+     - debug: var=uptime_result.stdout
+
+TASK [debug] **************************************************************************
+ok: [web1] => {
+    "uptime_result.stdout": " 05:43:54 up  1:50,  1 user,  load average: 5.37, 8.11, 6.01"
+}
+ok: [web2] => {
+    "uptime_result.stdout": " 05:43:54 up  1:50,  1 user,  load average: 5.37, 8.11, 6.01"
+}
+
+
+Symlinks are common in practice while configuring services. Write a playbook which when executed, creates a file /tmp/by_ansible on the remote hosts. This file must contains the facts/info of /var/run file.
+
+
+A playbook is already at /home/thor/playbooks/playbook.yml for you to start.
+The remote hosts are listed in the inventory file: /home/thor/playbooks/inventory.
+Please complete the task on that file.
+
+To test it with: ansible-playbook -i inventory playbook.yml
+
+---
+- hosts: all
+  gather_facts: no  
+  tasks:    
+    - name: stat module help to find the file info
+      stat:
+        path: /var/run
+      register: your_variable
+
+    # for your reference, check the outputs of these
+    - debug:
+       var=your_variable.stat
+
+    # your code goes here...
+    - shell: echo "{{your_variable.stat}}" > /tmp/by_ansible
+
+A friend of yours came to you with this broken playbook: /home/thor/playbooks/help_me_fix_it.yml. Help him fix it.
+
+
+The playbook is supposed to get information about the operating system of the remote hosts and save it to file /tmp/output.txt . Please use the inventory: /home/thor/playbooks/inventory for this task.
+
+Once completed, please test as: ansible-playbook -i inventory help_me_fix_it.yml
+
+
+
+
+---
+- name: help me fix it playbook
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: alternative way to gather facts about remote host
+      setup:
+         filter='ansible_dist*'
+      register: facts
+
+    - shell: echo "{{facts.ansible_distribution}}" > /tmp/output.txt
+==>
+---
+- name: Help me fix it playbook
+  hosts: all
+  gather_facts: yes
+  tasks:
+    - name: Alternative way to gather facts about remote host
+      setup:
+        filter: 'ansible_dist*'
+      register: facts
+
+    - debug:
+        var: facts.ansible_facts.ansible_distribution
+
+    - name: Create /tmp/output.txt with distribution info
+      shell: echo "{{ facts.ansible_facts.ansible_distribution }}" > /tmp/output.txt
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

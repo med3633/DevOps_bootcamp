@@ -1,0 +1,156 @@
+Let us continue to improve our lamp stack project. Now that we have learned to organize tasks into separate files, let's move the variables to it's respective files. Create a host_vars and group_vars directory and move all variables to them. No variables to be defined in the main inventory file. Only the below parameters are to be configured as host variables. All other parameters are to be configured as group variables for the respective groups:
+
+Host Variables:
+
+ansible_host
+
+ansible_ssh_private_key_file
+
+ansible_user
+
+
+The inventory file is located at /home/thor/playbooks/lamp-stack-playbooks/inventory. You may edit its contents but not its filename or location.
+####lamp-stack-playbooks]$ cat inventory 
+[db_servers]
+lamp-db ansible_host=172.20.1.101 ansible_ssh_private_key_file=/home/thor/.ssh/maria ansible_user=maria mysqlservice=mysqld mysql_port=3306 dbname=ecomdb dbuser=ecomuser dbpassword=ecompassword
+
+[web_servers]
+lampweb ansible_host=172.20.1.100 ansible_ssh_private_key_file=/home/thor/.ssh/john ansible_user=john httpd_port=80 repository=https://github.com/kodekloudhub/learning-app-ecommerce.git
+## vi host_vars/lamp-db.yml
+ansible_host: 172.20.1.101
+ansible_ssh_private_key_file: /home/thor/.ssh/maria
+ansible_user: maria
+##cat host_vars/lampweb.yml
+ansible_host: 172.20.1.100
+ansible_ssh_private_key_file: /home/thor/.ssh/john
+ansible_user: john
+##cat group_vars/db_servers.yml
+mysqlservice: mysqld
+mysql_port: 3306
+dbname: ecomdb
+dbuser: ecomuser
+dbpassword: ecompassword
+##cat group_vars/web_servers.yml
+httpd_port: 80
+repository: https://github.com/kodekloudhub/learning-app-ecommerce.git
+##cat playbooks/lamp-stack-playbooks/inventory 
+[db_servers]
+lamp-db 
+[web_servers]
+lampweb 
+Let's move the tasks to 3 separate files under the tasks directory. Create 3 files common.yml, db.yml and web.yml and move the associated tasks into each of them. Then include the tasks in the main playbook.
+
+
+Do not modify the tasks or task names. Only move them to the respective files
+mkdir tasks     
+##cat tasks/common.yml
+- name: Install common dependencies
+  yum:
+    name:
+      - libselinux-python
+      - libsemanage-python
+      - firewalld
+##cat tasks/db.yml
+- name: Install MariaDB package
+  yum:
+    name:
+      - mariadb-server
+      - MySQL-python
+    state: installed
+
+- name: Create Mysql configuration file
+  template: src=templates/my.cnf.j2 dest=/etc/my.cnf
+
+- name: Start MariaDB Service
+  service: name=mariadb state=started enabled=yes
+
+- name: Start firewalld
+  service: name=firewalld state=started enabled=yes
+
+- name: insert firewalld rule
+  firewalld: port={{ mysql_port }}/tcp permanent=true state=enabled immediate=yes
+
+- name: Create Application Database
+  mysql_db: name={{ dbname }} state=present
+
+- name: gather facts from lampweb
+  setup:
+  delegate_to: "{{ item }}"
+  delegate_facts: True
+  with_items: "{{ hostvars[groups['web_servers'][0]].groups.web_servers }}"
+
+- name: Create Application DB User
+  mysql_user: name={{ dbuser }} password={{ dbpassword }} priv=*.*:ALL host={{ hostvars['lampweb']['ansible_facts']['eth0']['ipv4']['address'] }} state=present
+
+- name: Move db-load-script to db host
+  template:
+    src: templates/db-load-script.sql.j2
+    dest: /tmp/db-load-script.sql
+
+- name: Load Inventory Data
+  shell: mysql -f < /tmp/db-load-script.sql
+##cat tasks/web.yml
+- name: Install httpd and php
+  yum:
+    name:
+      - httpd
+      - php
+      - php-mysql
+    state: present
+
+- name: Install web role specific dependencies
+  yum: name=git state=installed
+
+- name: Start firewalld
+  service: name=firewalld state=started enabled=yes
+
+- name: insert firewalld rule for httpd
+  firewalld: port={{ httpd_port }}/tcp permanent=true state=enabled immediate=yes
+
+- name: Set index.php as the default page
+  tags: "Set index.php as the default page"
+  replace:
+    path: /etc/httpd/conf/httpd.conf
+    regexp: 'DirectoryIndex index.html'
+    replace: 'DirectoryIndex index.php'
+
+- name: http service state
+  service: name=httpd state=started enabled=yes
+
+- name: Copy the code from repository
+  git: repo={{ repository }} dest=/var/www/html/  force=yes
+
+- name: Creates the index.php file
+  template: src=templates/index.php.j2 dest=/var/www/html/index.php
+ 
+If not done already include the tasks in the main deploy-lamp-stack.yml
+
+---
+
+- name: Deploy lamp stack application
+  hosts: all
+  become: yes
+  tasks:
+    - include_tasks: tasks/common.yml
+
+    # Install and Configure Database
+- name: Deploy lamp stack application
+  hosts: lamp-db
+  gather_facts: yes
+  become: yes
+  tasks:
+    - include_tasks: tasks/db.yml
+
+- name: Deploy lamp stack application
+  hosts: lampweb
+  gather_facts: yes
+  become: yes
+  tasks:
+    - include_tasks: tasks/web.yml
+
+
+
+
+
+
+

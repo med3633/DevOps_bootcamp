@@ -1,0 +1,145 @@
+Step-by-Step Guide to Resolve the Issue:
+Ensure EPEL Repository is Installed and Enabled:
+
+Make sure the EPEL repository is correctly installed and enabled:
+
+sh
+Copier le code
+sudo yum install epel-release -y
+Check EPEL Repository Configuration:
+
+Verify that the EPEL repository is enabled:
+
+sh
+Copier le code
+sudo yum repolist
+You should see the EPEL repository listed in the output. If not, you may need to manually enable it by editing the repository configuration file:
+
+sh
+Copier le code
+sudo nano /etc/yum.repos.d/epel.repo
+Ensure that the following line is present and uncommented (remove the leading # if present):
+
+ini
+Copier le code
+enabled=1
+Clear Yum Cache:
+
+Clear the yum cache to ensure it fetches the latest package information:
+
+sh
+Copier le code
+sudo yum clean all
+sudo yum makecache
+Install Ansible Using EPEL:
+
+After ensuring the EPEL repository is configured correctly, try installing Ansible again:
+
+sh
+Copier le code
+sudo yum install ansible -y
+If the EPEL repository still does not provide the Ansible package, you can manually install it using an alternative method.
+
+Alternative Method: Install Ansible via PIP
+Install Python and PIP:
+
+Ensure Python and PIP are installed on your system:
+
+sh
+Copier le code
+sudo yum install python3 python3-pip -y
+Install Ansible Using PIP:
+
+Use PIP to install Ansible:
+
+sh
+Copier le code
+sudo pip3 install ansible
+Verify the Installation:
+
+Verify that Ansible is installed:
+
+sh
+Copier le code
+ansible --version
+Summary of Commands for Alternative Method:
+sh
+Copier le code
+sudo yum install python3 python3-pip -y
+sudo pip3 install ansible
+ansible --version
+By following these steps, you should be able to install Ansible on your Ansible controller, even if it's not available in the default Yum repositories.
+
+
+For debugging purposes, we would like to configure Ansible to write logs to a different path than default. Configure Ansible to write logs to /var/log/ansible/ansible.log.
+ChatGPT
+To configure Ansible to write logs to a different path than the default, you'll need to adjust the logging configuration in the ansible.cfg file. Here's how you can do it:
+
+Create the Log Directory:
+
+First, create the directory where you want Ansible to write the logs:
+
+sh
+Copier le code
+sudo mkdir -p /var/log/ansible
+Edit the ansible.cfg File:
+
+Open the ansible.cfg file in your preferred text editor. If you don't have one yet in your ~/playbooks directory, create it:
+
+sh
+Copier le code
+nano ~/playbooks/ansible.cfg
+Configure Ansible Logging:
+
+Add or modify the following lines under the [defaults] section in the ansible.cfg file:
+
+ini
+Copier le code
+[defaults]
+inventory = /home/thor/playbooks/inventory
+deprecation_warnings = False
+
+[ssh_connection]
+timeout = 60
+
+[logging]
+file = /var/log/ansible/ansible.log
+[logging]: This section specifies the logging configuration.
+file: Specifies the path where Ansible should write its logs. In this case, it's set to /var/log/ansible/ansible.log.
+Save and Close the File:
+
+Save the changes to the ansible.cfg file and close the text editor. For example, in nano, you can save by pressing CTRL + O and then CTRL + X to exit.
+
+Example ansible.cfg File:
+Your ansible.cfg file in the ~/playbooks directory should now look like this:
+
+ini
+Copier le code
+[defaults]
+inventory = /home/thor/playbooks/inventory
+deprecation_warnings = False
+
+[ssh_connection]
+timeout = 60
+
+[logging]
+file = /var/log/ansible/ansible.log
+Verify the Configuration:
+To ensure the configuration is being applied correctly, you can run an Ansible command from the ~/playbooks directory:
+
+sh
+Copier le code
+cd ~/playbooks
+ansible --version
+This command doesn't perform an operation but helps confirm that Ansible is using the ansible.cfg file from the correct location and thus should use the logging configuration specified there.
+
+Notes:
+Ensure that the directory /var/log/ansible exists and that the user running Ansible has write permissions to it.
+Adjust the file path (file = /var/log/ansible/ansible.log) to fit your specific logging needs and system setup.
+By following these steps, Ansible will now write its logs to /var/log/ansible/ansible.log as configured in the ansible.cfg file.
+
+
+
+
+
+

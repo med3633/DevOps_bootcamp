@@ -1,0 +1,141 @@
+Create an inventory file under ~/playbooks directory on Ansible controller host and add web1 as managed node. IP address of the web1 node is 172.20.1.100, SSH user is root and password is Passw0rd.
+
+
+Create a playbook ~/playbooks/zip.yml to make a zip archive opt.zip of /opt directory on web1 node and save it under /root directory on web1 node itself.
+
+[web1]
+172.20.1.100 ansible_ssh_user=root ansible_ssh_pass=Passw0rd
+
+---
+- hosts: web1
+  become: yes
+  tasks:
+    - name: Create zip archive of /opt directory
+      archive:
+        path: /root/opt.zip
+        src: /opt
+
+On Ansible controller, we have a zip archive local.zip. We want to extract its contents on web1 under /tmp directory. Create a playbook local.yml under ~/playbooks directory to complete the task.
+---
+- name: extract local.zip to web1
+  hosts: web1
+  tasks:
+  - unarchive:
+      src: local.zip
+      dest: /tmp
+
+On web1 node we have an archive data.tar.gz under /root directory, extract it under /srv directory by developing a playbook ~/playbooks/data.yml and make sure data.tar.gz archive is removed after that.
+
+---
+- hosts: web1
+  become: yes
+  tasks:
+    - name: Ensure /srv directory exists
+      file:
+        path: /srv
+        state: directory
+        mode: '0755'
+
+    - name: Extract data.tar.gz to /srv
+      unarchive:
+        src: /root/data.tar.gz
+        dest: /srv
+        remote_src: yes
+
+    - name: Remove data.tar.gz
+      file:
+        path: /root/data.tar.gz
+        state: absent
+
+Create a playbook download.yml under ~/playbooks directory to download and extract the https://github.com/kodekloudhub/Hello-World/archive/master.zip zip archive under /root directory on the web1 node.
+
+---
+- hosts: web1
+  become: yes
+  tasks:
+    - name: Ensure /root directory exists
+      file:
+        path: /root
+        state: directory
+        mode: '0755'
+
+    - name: Download master.zip from GitHub
+      get_url:
+        url: https://github.com/kodekloudhub/Hello-World/archive/master.zip
+        dest: /root/master.zip
+        mode: '0644'
+
+    - name: Extract master.zip
+      unarchive:
+        src: /root/master.zip
+        dest: /root
+        remote_src: yes
+
+    - name: Remove master.zip
+      file:
+        path: /root/master.zip
+        state: absent
+
+We have three files on web1 node /root/file1.txt, /usr/local/share/file2.txt and /var/log/lastlog. Create a bz2 archive of all these files and save it under /root directory, name the archive as files.tar.bz2. You can create ~/playbooks/files.yml playbook for it.
+
+---
+- hosts: web1
+  become: yes
+  tasks:
+    - name: Ensure /root directory exists
+      file:
+        path: /root
+        state: directory
+        mode: '0755'
+
+    - name: Create tar.bz2 archive of files
+      archive:
+        path: /root/files.tar.bz2
+        src:
+          - /root/file1.txt
+          - /usr/local/share/file2.txt
+          - /var/log/lastlog
+        format: bz2
+We want to setup nginx on web1 node with some sample html code. Create a playbook ~/playbooks/nginx.yml to do so. Below are the details about the task:
+
+
+a. Install nginx package and start/enable its service.
+
+b. Extract /root/nginx.zip archive under /usr/share/nginx/html directory.
+
+c. Inside /usr/share/nginx/html/index.html replace line This is sample html code with line This is KodeKloud Ansible lab.
+
+
+---
+- hosts: web1
+  become: yes
+  tasks:
+    - name: Install Nginx package
+      yum:
+        name: nginx
+        state: present
+
+    - name: Start and enable Nginx service
+      systemd:
+        name: nginx
+        state: started
+        enabled: yes
+
+    - name: Ensure /usr/share/nginx/html directory exists
+      file:
+        path: /usr/share/nginx/html
+        state: directory
+        mode: '0755'
+
+    - name: Extract nginx.zip to /usr/share/nginx/html
+      unarchive:
+        src: /root/nginx.zip
+        dest: /usr/share/nginx/html
+        remote_src: yes
+
+    - name: Replace content in index.html
+      replace:
+        path: /usr/share/nginx/html/index.html
+        regexp: 'This is sample html code'
+        replace: 'This is KodeKloud Ansible lab'
+
