@@ -1,0 +1,139 @@
+Perform the following tasks:
+
+Install ansible using the package manager if not installed.
+Generate your ssh key to path ~/.ssh/id_rsa
+Push the public key: (~/.ssh/id_rsa.pub) on the remote servers listed in: ~/playbooks/inventory
+Test your setup is working with: ansible all -m ping -i /home/thor/playbooks/inventory
+
+Use password: Passw0rd to ssh onto the remote hosts. Remember the remote hosts are managed by the root user.
+
+[thor@ansible-controller playbooks]$ ansible all -m ping -i inventory 
+node01 | SUCCESS => {
+    "changed": false, 
+    "ping": "pong"
+}
+node00 | SUCCESS => {
+    "changed": false, 
+    "ping": "pong"
+}
+[thor@ansible-controller playbooks]$ cat inventory 
+node00 ansible_host=172.20.1.100 ansible_user=root ansible_password=Passw0rd
+node01 ansible_host=172.20.1.101 ansible_user=root ansible_password=Passw0rd
+
+Write a playbook: ~/playbooks/add_user_with_ssh.yml to create a user: deploy on remote hosts. Its a best practice to ssh using public-key than to use a plain text password. Copy the public key: ~/playbooks/devops.pub to remote hosts inside deploy user's authorized_keys.
+
+Use inventory file: ~/playbooks/inventory.
+
+Create add_user_with_ssh.yml playbook and add below given code
+
+---
+- hosts: all
+  tasks:
+    - user:
+        name: deploy
+        state: present
+    - authorized_key:
+        user: deploy
+        key: "{{ lookup('file', 'devops.pub') }}"
+        state: present
+
+Write a playbook /home/thor/playbooks/install_from_source.yml to install a tool: mosh from the source:https://github.com/mobile-shell/mosh on all servers (Server details are specified inside the inventory file named /home/thor/playbooks/inventory).
+
+A normal install from source flow is:
+
+git clone https://github.com/mobile-shell/mosh
+cd mosh
+./autogen.sh
+scl enable devtoolset-7 -- ./configure
+scl enable devtoolset-7 -- make && make install
+
+To compile mosh from source, you need these dependencies:
+
+git
+make
+autoconf
+automake
+protobuf-devel
+libutempter-devel
+ncurses-devel
+openssl-devel
+devtoolset-7-gcc*
+
+Create install_from_source.yml playbook and add below given code
+
+---
+- hosts: all
+  tasks:
+    - package:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - git
+        - make
+        - autoconf
+        - automake
+        - protobuf-devel
+        - libutempter-devel
+        - ncurses-devel
+        - openssl-devel
+        - devtoolset-7-gcc*
+    - git:
+        repo: https://github.com/mobile-shell/mosh
+        dest: /tmp/mosh
+        force: yes
+    - shell: |
+        ./autogen.sh
+        scl enable devtoolset-7 -- ./configure
+        scl enable devtoolset-7 -- make
+        make install
+      args:
+        chdir: /tmp/mosh
+
+Write a playbook ~/playbooks/logrotate.yml to configure log-rotation on remote hosts.
+
+Complete the following tasks:
+
+Grab the module from GitHub: https://github.com/arillso/ansible.logrotate
+Use ansible-galaxy install command to install inside the /home/thor/playbooks/roles
+If you stumbled upon the issue, could not find/use git, install git in the ansible-runner first and install the role.
+
+Configure your log rotation rules as:
+
+daily
+rotate 3
+compress
+…to rotate a log file that would present on location /var/log/myapp.log
+
+That means rotate daily, compress the log file and keep the last three rotations.
+Check on the options section that the role provides. Since this role depends on facts on remote hosts, make sure to gather facts is not false.
+
+
+To install from ansible-galaxy use:
+ansible-galaxy install git+https://github.com/repo... --roles-path ~/playbooks/roles
+
+You may need to make some changes inside roles/ansible.logrotate/defaults/main.yml file.
+
+install the role using ansible-galaxy
+
+ansible-galaxy install git+https://github.com/arillso/ansible.logrotate --roles-path ~/playbooks/roles
+Update roles/ansible.logrotate/defaults/main.yml and modify logrotate_applications section as below:
+logrotate_applications:
+  - name: myapp
+    definitions:
+      - logs:
+          - /var/log/myapp.log
+        options:
+          - daily
+          - rotate 3
+          - compress
+Create logrotate.yml playbook and add below given code
+
+---
+- hosts: all
+  gather_facts: yes
+  roles:
+    - ansible.logrotate
+
+
+
+
