@@ -1,0 +1,134 @@
+We have created a few resources in the configuration directory /root/terraform-projects/project-anime. Inspect it.
+
+Which of the following resources names are not part of the terraform state?
+==> resource "local_file" "top10" {
+    filename = "/root/anime/top10.txt"
+    content  = "1. Naruto\n2. DragonBallZ\n3. Death Note\nFullmetal Alchemist\nOne-Punch Man\n"
+  
+}
+resource "local_file" "hall_of_fame" {
+  filename = "/root/anime/hall-of-fame.txt"
+  content = "1.Attack On Titan\n2. Naruto\n3. Bleach\n"
+
+}
+resource "local_file" "new_shows" {
+  filename = "/root/anime/new_shows.txt"
+  content = "1. Cannon Busters\n2. Last Hope\n3. Lost Song\n"
+
+}
+resource "local_file" "classics" {
+  filename = "/root/anime/classic_shows.txt"
+  content = "1. DragonBall\n"
+
+}
+
+==> super_pets
+
+Which command would you use to show the attributes of the resource called classics stored in the terraform state?
+
+==> terrafom show state local_file.classic
+
+What is the value of the attribute called id that is created for the local file resource called top10?
+
+=> 6...
+
+We no longer wish to manage the file located at /root/anime/hall-of-fame.txt by Terraform. Remove the resource responsible for this file completely from the management of terraform.
+
+==> Remove the resource block called hall_of_fame from the main.tf and also remove it from the state file by running terraform state rm local_file.hall_of_fame.
+
+
+Now navigate to the directory /root/terraform-projects/super-pets. Just like the previous configuration directory, we have already created the resource. Inspect the configuration and identify the only resource type used.
+
+## main.tf
+resource "random_pet" "super_pet_1" {
+    length = var.length1
+    prefix = var.prefix1
+}
+resource "random_pet" "super_pet_2" {
+    length = var.length2
+    prefix = var.prefix2
+}
+## terraform.tf
+terraform {
+  backend "s3" {
+    key = "terraform.tfstate"
+    region = "us-east-1"
+    bucket = "remote-state"
+    endpoint = "http://172.16.238.105:9000"
+    force_path_style = true
+
+
+    skip_credentials_validation = true
+
+    skip_metadata_api_check = true
+    skip_region_validation = true
+  }
+}
+
+## variables.tf
+terraform {
+  backend "s3" {
+    key = "terraform.tfstate"
+    region = "us-east-1"
+    bucket = "remote-state"
+    endpoint = "http://172.16.238.105:9000"
+    force_path_style = true
+
+
+    skip_credentials_validation = true
+
+    skip_metadata_api_check = true
+    skip_region_validation = true
+  }
+}
+==>  random_pet
+
+Within this configuration the terraform state commands are working (Try it!) but there is no terraform.tfstate file present!
+
+What is the reason for this behavior?
+
+==> we are using remote-state 
+
+What is the id of the random_pet resource called super_pet_2 in the state file?
+
+terraform show
+# random_pet.super_pet_1:
+resource "random_pet" "super_pet_1" {
+    id        = "Super-ladybug"
+    length    = 1
+    prefix    = "Super"
+    separator = "-"
+}
+
+# random_pet.super_pet_2:
+resource "random_pet" "super_pet_2" {
+    id        = "Wonder-logical-snapper"
+    length    = 2
+    prefix    = "Wonder"
+    separator = "-"
+}
+
+Rename the resource from super_pet_1 to ultra_pet.
+
+
+Change the name in the main.tf file as well as the state.
+
+==> Change the name in the main.tf and also run terraform state mv random_pet.super_pet_1 random_pet.ultra_pet.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
