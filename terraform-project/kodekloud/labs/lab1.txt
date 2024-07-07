@@ -1,0 +1,18 @@
+TF file and is used for writing configuration files in Terraform using HCL.
+
+local provider 
+resource "local_file" "games" {
+  filename     = "/root/favorite-games"
+  content  = "FIFA 21"
+}
+
+backup
+
+resource "local_sensitive_file" "games" {
+  filename     = "/root/favorite-games"
+  content  = "FIFA 21"
+}
+
+
+Finally, destroy this resource using terraform destroy.
+

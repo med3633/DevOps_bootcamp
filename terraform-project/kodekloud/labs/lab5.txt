@@ -1,0 +1,60 @@
+How can we use environment variables to pass input variables in terraform scripts?
+==> TF_VAR <var>
+
+Which method has the highest priority in Variable Definition Precedence?
+
+If unsure, Refer to the documentation. Documentation tab is available at the top right.
+
+==> terraform apply -var ......... -var .....
+
+Which one of the following commands is a valid way to make use of a custom variable file with the terraform apply command?
+==> terraform apply -var-file variables.tfvars
+
+We have created some files under the directory /root/terraform-projects/variables. Inspect it.
+##basket.auto.tfvars
+filename = "/root/basketball.txt"
+##main.tf
+resource local_file games {
+  filename = var.filename
+  content = "football"
+}
+##terraform.tfvars
+filename = "/root/football.txt"
+##throw.auto.tfvars
+filename = "/root/baseball.txt"
+What will happen if we run terraform plan command right now?
+
+Try it.
+==> error
+
+The terraform plan command did not run as there was no reference for the input variable called filename in the configuration files.
+
+Let's fix that now.
+Declare the variable called filename with type string in the file variables.tf.
+Don't have to specify a default value.
+
+variable "filename" {
+    type = string
+  
+}
+If we run terraform apply with a -var command line flag as shown below, which value would be considered by terraform?
+
+terraform apply -var filename=/root/tennis.txt
+
+=> /root/tennis.txt
+
+Terraform follows a variable definition precedence order to determine the value and
+the command line flag of –var or –var-file takes the highest priority.
+
+
+
+
+
+
+
+
+
+
+
+
+

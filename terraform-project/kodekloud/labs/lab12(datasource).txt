@@ -1,0 +1,86 @@
+A data source once created, can be used to create, update, and destroy infrastructure?
+
+True or False?
+==> false
+
+A data source can be created using the data block.
+
+True or False?
+
+==> true
+
+A new configuration directory has been created at /root/terraform-projects/project-lexcorp. A data source block is defined in the main.tf file to read the contents of an existing file.
+
+There is also an output variable that uses reference expression to print the file content using this data source. However, there is something wrong!
+
+
+Troubleshoot and fix the issue.
+
+
+When ready, run terraform init, plan and apply to create the datasource. The configuration should print the output variable correctly.
+
+output "os-version" {
+  value = data.local_file.content
+}
+datasource "local_file" "os" {
+  filename = "/etc/os-release"
+}
+==>
+output "os-version" {
+  value = data.local_file.os.content
+}
+data "local_file" "os" {
+  filename = "/etc/os-release"
+}
+
+Now let's practice how to work with data sources from other providers.
+
+The next few questions will be based on the aws provider.
+Although we have only predominantly worked with local and the random provider, this exercise will help you learn how to work with different data sources using the documentation.
+
+Don't worry if the configuration blocks and the arguments are unfamiliar. We will cover them in detail in the upcoming section.
+
+We have now created a new configuration file called ebs.tf within the same configuration directory we have been working on.
+
+What is the resource type that we are working with here?
+
+data "aws_ebs_volume" "gp2_volume" {
+  most_recent = true
+
+  filter {
+    name   = "volume-type"
+    values = ["gp2"]
+  }
+}
+
+==> aws_ebs_volume
+
+Once this data source is created, how do we fetch the Volume Id for the resource that is created in AWS?
+
+You may have to look up the documentation for this one. Documentation tab is available at the top right.
+
+Check the attribute reference for the ebs volume:
+
+==> volume_id
+
+Another file called s3.tf has now been created. It too has a data source that will be used to read data of an existing s3 bucket.
+
+However, there is a mistake in the argument used. What is wrong here?
+
+
+You may have to look up the documentation for this one. Documentation tab is available at the top right.
+
+data "aws_s3_bucket" "selected" {
+  bucket_name = "bucket.test.com"
+}
+
+https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/s3_bucket
+
+The argument should be bucket not bucket_name.
+data "aws_s3_bucket" "selected" {
+  bucket = "bucket.test.com"
+}
+
+
+
+

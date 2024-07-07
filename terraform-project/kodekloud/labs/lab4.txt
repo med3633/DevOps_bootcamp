@@ -1,0 +1,101 @@
+Which of the following is not a valid variable type?
+==> item
+Which one of the below is not a valid data type in terraform?
+==> array
+Navigate to the directory /root/terraform-projects/variables. Which type does the variable called number belong to?
+variable "name" {
+     type = string
+     default = "Mark"
+  
+}
+variable "number" {
+     type = bool
+     default = true
+  
+}
+variable "distance" {
+     type = number
+     default = 5
+  
+}
+variable "jedi" {
+     type = map
+     default = {
+     filename = "/root/first-jedi"
+     content = "phanius"
+     }
+  
+}
+
+variable "gender" {
+     type = list(string)
+     default = ["Male", "Female"]
+}
+variable "hard_drive" {
+     type = map
+     default = {
+          slow = "HHD"
+          fast = "SSD"
+     }
+}
+variable "users" {
+     type = set(string)
+     default = ["tom", "jerry", "pluto", "daffy", "donald", "jerry", "chip", "dale"]
+
+  
+}
+==> bool
+How would you fetch the value of the key called slow from the variable called hard_drive in a terraform configuration?
+
+This variable is defined in the file variables.tf.
+==> var.hard_drive["slow"]
+
+
+What is the type of variable called users?
+
+set(string)
+
+However, this variable has been defined incorrectly! Identify the mistake.
+
+==> duplicated elements
+
+What is the value for the argument called content used in the resource block for the resource jedi?
+
+resource "local_file" "jedi" {
+     filename = "/root/first-jedi"
+     content = "phanius"
+}
+
+==>phanius
+
+Now, let's update this resource and add variables instead. Use the default value declared in the variable called jedi.
+
+
+This variable is a map. For the argument called content use the value of the key by the same name.
+And, similarly, for the argument called filename use the value by the same name.
+
+
+When ready, run terraform init, plan and apply to create this resource.
+
+resource "local_file" "jedi" {
+     filename = var.jedi["filename"]
+     content = var.jedi["content"]
+}
+
+
+
+What is the index of the element called Female in the variable called gender?
+=> 1
+
+
+
+
+
+
+
+
+
+
+
+
+

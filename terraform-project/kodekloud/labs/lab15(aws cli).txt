@@ -1,0 +1,164 @@
+From this lab onwards, we will be working with aws services! In this lab, we will learn how to make use of aws cli to explore and deploy IAM resources that we learnt in the previous lecture.
+As explained in the Lab Demonstration video, we are making use of localstack as the mocking framework to work with AWS.
+
+This framework is exposed at http://aws:4566. Hence, throughout this lab, we will be making use of the command option and parameter like this: --endpoint http://aws:4566
+
+
+
+First, let's explore the AWS CLI configuration.
+What is the exact version of the CLI installed on the iac-server?
+
+aws --version
+aws-cli/2.13.12 Python/3.11.4 Linux/5.4.0-1106-gcp exe/x86_64.ubuntu.22 prompt/off
+
+Which command should be used to interact with Identity and Access Management in AWS using the CLI?
+
+If unsure, use the CLI help by running: aws <command> help
+
+==> iam
+
+Which subcommand with iam can be used to list all the users created in aws?
+
+If unsure, use the CLI help by running: aws iam <subcommand>  help
+
+==> list-users
+
+Now, let's learn how to make use of the mocking framework used in the labs.
+
+Run: aws iam list-users
+
+Does it work?
+
+==> no
+
+This is because, we have not provided the --endpoint option.
+Now, run the same command but with the --endpoint http://aws:4566 as the option, like this:
+aws --endpoint http://aws:4566 iam list-users
+
+How many IAM Users do you see listed now?
+
+==> 2
+
+Now let's add a few more users! To add more users, we need to make use of the create-user sub-command.
+However, we also need to pass in a mandatory option with this command for it to work?
+
+Which option should we use?
+==> --user-name
+
+Create a new user called mary using the AWS CLI.
+
+
+Make sure to use the --endpoint http://aws:4566 option with the command.
+==> aws --endpoint http://aws:4566 iam create-user --user-name mary
+
+
+Now, inspect the newly created user mary and find out its ARN (Amazon Resource Name).
+==> arn:aws:iam::000000000000:user/mary
+
+What is the default region that has been configured for use with the AWS CLI?
+ ==> cat .aws/config 
+[default]
+region = us-east-1
+
+What is the aws_access_key_id used in the configuration?
+=> cat .aws/credentials 
+[default]
+aws_access_key_id = foo
+aws_secret_access_key = bar
+
+Now that we have a few users created, let's grant them privileges.
+Let's start with mary, grant her full administrator access by making use of the policy called AdministratorAccess.
+
+
+Make use of the subcommand attach-user-policy.
+The ARN of the AdministratorAccess policy is arn:aws:iam::aws:policy/AdministratorAccess.
+==> aws --endpoint http://aws:4566 iam attach-user-policy --user-name mary --policy-arn arn:aws:iam::aws:policy/AdministratorAccess
+
+jack and jill are developers and are part of a project called project-sapphire.
+Create a new IAM Group called project-sapphire-developers.
+
+
+Use the subcommand create-group to create the group.
+==> aws --endpoint http://aws:4566 iam create-group --group-name project-sapphire-developers
+
+Add the IAM users called jack and jill, who are developers to the new IAM Group called project-sapphire-developers.
+
+
+Use the subcommand add-user-to-group to add users into the group.
+==> aws --endpoint http://aws:4566 iam add-user-to-group --user-name jack --group-name project-sapphire-developers and aws --endpoint http://aws:4566 iam add-user-to-group --user-name jill --group-name project-sapphire-developers
+
+What privileges are granted for jack and jill who are part of the group project-sapphire-developers?
+
+Check for their permissions individually and the ones granted to the group.
+
+==> Check Policies attached to the group by running: aws --endpoint http://aws:4566 iam list-attached-group-policies --group-name project-sapphire-developers and for individuals by running aws --endpoint http://aws:4566 iam list-attached-user-policies --user-name jack (use user-name as jill to check her permissions)
+
+NONE
+
+Both jack and jill need complete access to the EC2 service.
+
+
+Attach the AmazonEC2FullAccess policy with the ARN: arn:aws:iam::aws:policy/AmazonEC2FullAccess to the group project-sapphire-developers.
+==> aws --endpoint http://aws:4566 iam attach-group-policy --group-name project-sapphire-developers  --policy-arn arn:aws:iam::aws:policy/AmazonEC2FullAccess
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

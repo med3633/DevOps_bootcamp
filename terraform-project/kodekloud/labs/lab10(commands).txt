@@ -1,0 +1,138 @@
+Which command can be used to create a visual representation of our terraform resources?*
+==> terraform graph
+We have created a configuration directory /root/terraform-projects/project-shazam. The configuration file inside will be used to create an RSA type private key and then a certificate signing request or a csr using this key.
+
+However, there is an error with the configuration.
+
+Use the terraform validate command, troubleshoot, and fix the issue.
+
+
+You don't have to create the resources yet! You only need to fix the errors reported by terraform validate.
+resource "local_file" "key_data" {
+        filename       = "/tmp/.pki/private_key.pem"
+        content = tls_private_key.private_key.private_key_pem
+        file_permission =  "0400"
+}
+resource "tls_private_key" "private_key" {
+  algorithm   = "RSA"
+  dsa_bits  = 2048
+  ecdsa_curve = "P384"
+}
+resource "tls_cert_request" "csr" {
+  private_key_pem = file("/tmp/.pki/private_key.pem")
+  depends_on = [ local_file.key_data ]
+
+  subject {
+    common_name  = "flexit.com"
+    organization = "FlexIT Consulting Services"
+  }
+}
+==> terraform validate
+ Error: Unsupported argument
+│ 
+│   on main.tf line 8, in resource "tls_private_key" "private_key":
+│    8:   dsa_bits  = 2048
+│ 
+│ An argument named "dsa_bits" is not expected here. Did you
+│ mean "rsa_bits"?
+
+Great! If you completed the previous question correctly, terraform validate should have passed!
+Now run terraform plan and generate a configuration plan.
+
+Did it work?
+terraform plan
+terraform apply
+==> yes
+Now, try creating the resources with a terraform apply.
+
+Did that work?
+==> no
+The terraform apply failed in spite of our validation working! This is because the validate command only carries out a general verification of the configuration.
+It validated the resource block and the argument syntax but not the values the arguments expect for a specific resource!
+The error in the configuration is inside the resource block for the tls_private_key type resource.
+It contains the configuration that we needed for generating rsa type key..
+
+Inspect the resource block and fix the issue.
+
+
+Once done, run terraform plan and then apply to created the resources.
+
+Now format the main.tf file into a canonical format.
+==> terraform fmt
+Now, navigate to the directory /root/terraform-projects/project-a. We have already created the resources specified in this configuration.
+
+Fetch details from the state file and identify the value of the filename argument.
+
+Note: Do not rely on the current value in the configuration file.
+
+resource "local_file" "data" {
+	  filename = "/opt/codes"
+	  content = "You've to write this code."
+}
+==> /root/codes
+In these terraform labs, we have used multiple providers so far. But, what are providers?
+==> plugins
+Which one is a valid sub-command of the terraform providers command?
+==> mirior
+A new configuration directory /root/terraform-projects/provider has been created. We have already run the terraform init command.
+Now check the provider plugins that have been downloaded from the command line utility (instead of inspecting the .terraform directory).
+ After that choose the correct option.
+provider.tf
+terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+      version = "4.15.0"
+    }
+  }
+}
+
+
+provider "aws" {
+  region                      = lookup(var.region, terraform.workspace)
+  skip_credentials_validation = true
+  skip_requesting_account_id  = true
+  s3_use_path_style = true
+  endpoints {
+    ec2 = "http://aws:4566"
+    dynamodb = "http://aws:4566"
+    s3 = "http://aws:4566"
+  }
+}
+project.tf
+
+resource "local_file" "cloud" {
+	   filename = "/tmp/plugins"
+	   content = "multiple cloud providers."
+
+}
+
+resource "aws_ebs_volume" "myvolume" {
+  availability_zone = "us-east-2"
+  size              = 20
+}
+==> local && aws
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,190 @@
+We have a directory created called /root/terraform-projects/project-mysterio. The main.tf file already has a couple of resource blocks.
+
+Which resource types do they use?
+##variables.tf
+variable "length" {
+    default = 10
+  
+}
+variable "filename" {
+    default = "/root/random_text"
+}
+variable "content" {
+    default = "This file contains a single line of data"
+}
+variable "permission" {
+    default = 0700
+}
+
+## main.tf
+resource "local_file" "file" {
+    filename = var.filename
+    file_permission =  var.permission
+    content = random_string.string.id
+    
+}
+
+resource "random_string" "string" {
+    length = var.length
+    keepers = {
+        length = var.length
+    }  
+    
+}
+==> local_file && random_string
+
+Now, create these two resources that have been defined in this configuration file.
+
+Which resource is created first in this case?
+==> string
+
+We have modified the resource configuration again. Run a terraform plan now. What would happen?
+==> both ressources will be replaced
+
+Why is the string resource being re-created?
+==> the value for the argument 
+
+All the resources for the random provider can be recreated by using a map type argument called keepers. A change in the value will force the resource to be recreated.
+
+
+This argument accepts arbitrary key/value pairs and in our example, it is set to the key called length whose value was updated from 10 to 12 in the variables.tf file.
+
+Running a terraform apply now will destroy the current random_string resource and then create a new one with the length that is 12 characters long.
+Let's change the order in which the resource called string is recreated. Update the configuration so that when applied, a new random string is created first before the old one is destroyed.
+
+
+When ready, apply the changes with terraform apply
+
+==> Use the lifecycle rule of create_before_destroy.
+==> resource "local_file" "file" {
+    filename = var.filename
+    file_permission =  var.permission
+    content = random_string.string.id
+
+}
+
+resource "random_string" "string" {
+    length = var.length
+    keepers = {
+        length = var.length
+    }  
+    lifecycle {
+        create_before_destroy =  true
+    }
+
+}
+
+
+
+The resource block for the file resource has been updated! This will force the resource to be recreated during the next apply! But, before that, let's also add a lifecycle rule of create_before_destroy to this resource block.
+
+
+When ready, apply the changes with terraform apply
+
+
+Important: Once the lifecycle rule has been added, only run the apply command once. We will learn why soon.
+
+==> Update main.tf file adding lifecycle rule under the resource local_file
+==> resource "local_file" "file" {
+    filename = var.filename
+    file_permission =  var.permission
+    content = "This is a random string - ${random_string.string.id}"
+    lifecycle {
+        create_before_destroy =  true
+    }
+
+}
+
+resource "random_string" "string" {
+    length = var.length
+    keepers = {
+        length = var.length
+    }
+    lifecycle {
+        create_before_destroy =  true
+    }
+
+}
+
+Great! We have now added the lifecycle rule and forced the resources to be created first and then destroyed.
+
+What is the id of the file resource we just created?
+
+Run terraform show or terraform state show local_file.file to find out.
+
+==> terraform show
+
+Read the contents of the file /root/random_text manually. (Try opening with Visual Studio Code / cat command or a text editor)
+
+What is the content of this file?
+
+==> no such file or directory
+
+Where did the file go?!!?
+
+If you observe the output of the previous apply (scroll up!), you will see that the lifecycle rule we applied caused the local file to the created first and the same file to be destroyed during the recreate operation.
+
+
+This goes to show that it is not always advisable to use this rule!
+
+In this example, the filename argument for the local_file resource has to be unique which means that we cannot have two instances of the same file created at the same time!
+The random_string resource on the other hand is a logical resource that is only recorded in the state and does not have such a restriction.
+
+If you run terraform apply again, the file resource will be created as it does not exist currently.
+
+We have now wiped out the resources that were created in this configuration directory and updated the main.tf file.
+
+
+Now, it only contains a single random_pet resource called super_pet.
+
+Under which circumstances will a new pet id be created?
+
+==> both
+
+Now, update the configuration so that the resource super_pet is not destroyed under any circumstances with a terraform destroy or terraform apply command.
+==> Add the lifecyle rule prevent_destroy in the config file.
+
+==> resource "random_pet" "super_pet" {
+    length = var.length
+    prefix = var.prefix
+    lifecycle {
+      prevent_destroy = true
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

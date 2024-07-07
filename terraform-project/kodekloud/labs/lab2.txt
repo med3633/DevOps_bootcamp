@@ -1,0 +1,137 @@
+We have a new configuration directory located at the path /root/terraform-projects/things-to-do. Inspect this directory and find out the number of providers initialized within this directory.
+
+Do not run terraform init yet!
+
+main.tf
+resource "local_file" "things-to-do" {
+  filename     = "/root/things-to-do.txt"
+  content  = "Clean my room before Christmas\nComplete the CKA Certification!"
+}
+resource "local_file" "more-things-to-do" {
+  filename     = "/root/more-things-to-do.txt"
+  content  = "Learn how to play Astronomia on the guitar!"
+}
+==> 0
+
+How about now? How many provider plugins are installed in this configuration directory?
+
+==> 1
+How many configuration files exist in the directory: /root/terraform-projects/things-to-do ?
+==> 1
+
+How many resources are configured in this configuration directory?
+
+Count all the resource blocks used.
+
+==> 2
+
+What is the version of the plugin for the local provider that has been downloaded for this configuration? 
+in .hcl 
+==> 2.5.1
+
+Now, go ahead and create these resources using terraform!
+
+
+Once done, the two files defined inside the resource blocks should be created with the correct file names and content.
+
+terraform init
+terraform apply
+
+We have created another directory containing configuration files at /root/terraform-projects/christmas-wishlist.
+
+Inspect this configuration directory.
+##cyberpunk.tf
+resource "local_file" "cyberpunk" {
+  filename     = "/root/cyberpunk2077.txt"
+  content  = "All I need for Christmas is Cyberpunk 2077!"
+}
+##ps5.tf
+resource "local_file" "ps5" {
+  filename     = "/root/ps5.txt"
+  content  = "And a PS5!"
+}
+terraform init
+terraform apply
+
+
+Create a new configuration file within the same directory called xbox.tf. This file should make use of the same local_file resource type with the below requirements:
+
+
+Resource Name: xbox
+
+filename: /root/xbox.txt
+
+content: Wouldn't mind an XBox either!
+
+
+Once the configuration file has been created, use the terraform workflow to create this resource.
+
+resource "local_file" "xbox" {
+    filename = "/root/xbox.txt"
+    content = "wouldn't mind an XBox either!"
+  
+}
+
+Now, navigate to the directory /root/terraform-projects/provider-a. We have downloaded a plugin in this directory. Identify the name and type of provider.
+
+If the configuration files in this directory seem unfamiliar, do not worry, these are covered later in the course.
+
+terraform {
+  required_providers {
+    linode = {
+      source = "linode/linode"
+      version = "1.13.3"
+    }
+  }
+}
+
+=> partner
+
+Now, navigate to the directory /root/terraform-projects/provider-b. We have downloaded a plugin in this directory. Identify the name and type of provider.
+
+If the configuration files in this directory seem unfamiliar, do not worry, these are covered later in the course.
+
+terraform {
+  required_providers {
+    ansible = {
+      source = "nbering/ansible"
+      version = "1.0.4"
+    }
+  }
+}
+
+=> community
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
