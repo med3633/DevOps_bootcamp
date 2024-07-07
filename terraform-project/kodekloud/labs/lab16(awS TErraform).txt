@@ -1,0 +1,120 @@
+In this lab, we will learn how to deploy AWS resources using Terraform with the same mocking service that we use in the AWS CLI lab.
+Let's start off by creating an IAM User called mary but this time by making use of Terraform. In the configuration directory /root/terraform-projects/IAM, create a file called iam-user.tf with the following specifications:
+
+
+Resource Type: aws_iam_user
+
+Resource Name: users
+
+Name: mary
+
+
+Once the file has been created, run terraform init.
+==> resource "aws_iam_user" "users" {
+    name = "mary"
+  
+}
+Great! We now have a configuration file with a simple resource block for creating an IAM User with Terraform!
+
+Let's check if everything is in order for us to create this resource.
+
+Run terraform plan within this configuration.
+
+Did that work?
+==> no
+Why did the previous command fail?
+
+Inspect the error message.
+==> Region is not set 
+Let's do that now. We will add the argument region in our provider block called aws.
+
+We can do this via other means as well ( like the ones we saw in the lecture).
+
+However, we will be making use of the provider block to define additional arguments to make use of the mocking framework. We will see those in the later questions of this lab.
+Add a new file called provider.tf containing a provider block for aws.
+Inside this block add a single argument called region with the value ca-central-1
+
+
+You don't have to run a terraform plan or apply at this stage.
+==> provider "aws" {
+     region = "ca-central-1"
+
+}
+
+==> pour terraform plan work il faut ajouter le provider
+
+Since we are making use of the mocking framework, the credentials defined using aws configure (stored within the file /root/.aws/credentials) do not work as it is.
+
+We have now updated the provider.tf file with additional arguments to make it work. Take a look.
+
+The endpoint argument is similar to the one we saw with the AWS CLI where we used the --endpoint http://aws:4566. Here we have defined it to make it work with the IAM service.
+
+
+Please note that these additional configurations are not needed when working directly with the AWS Cloud. It is only needed by the lab as it is using an AWS mock framework.
+
+provider "aws" {
+  region                      = "us-east-1"
+  skip_credentials_validation = true
+  skip_requesting_account_id  = true
+
+  endpoints {
+    iam                       = "http://aws:4566"
+  }
+}
+
+Now, run a terraform plan and then a terraform apply
+
+==> it WORKS
+
+Great! We have added one user called mary. However, project_sapphire has 5 more people who need access to the AWS Account!
+
+Let's use the count meta-argument and the new variables.tf file created in the configuration directory to create these additional users!
+
+Inspect the newly created variables.tf file and answer the subsequent questions.
+
+variables.tf
+variable "project-sapphire-users" {
+     type = list(string)
+     default = [ "mary", "jack", "jill", "mack", "buzz", "mater"]
+}
+
+What is the data type used for the variable called project-sapphire-users?
+==> list(string)
+
+Now, update the iam-user.tf to make use of the count meta-argument to loop through the project-sapphire-users variable and create all the users in the list.
+
+
+You may want to make use of the length function to get the length of the list.
+Reference: https://www.terraform.io/docs/language/meta-arguments/count.html
+iam-user.tf
+resource "aws_iam_user" "users" {
+    name = var.project-sapphire-users[count.index]
+    count = length(var.project-sapphire-users)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
