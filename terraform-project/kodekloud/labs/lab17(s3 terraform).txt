@@ -1,0 +1,228 @@
+In this lab, we will work on configuration directories that have been created under /root/terraform-projects/S3-Buckets.
+
+Let's first inspect the configuration files in the directory called MCU.
+
+What is the AWS region configured for use in the provider block? (Assuming we do not pass in additional variables during command execution)
+## main.tf
+resource "aws_s3_bucket" "marvel-cinematic-universe" {
+  bucket = "mcu-202011121359"
+
+}
+## provider.tf
+terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+      version = "4.15.0"
+    }
+  }
+}
+
+provider "aws" {
+  region                      = var.region
+  s3_use_path_style = true
+  skip_credentials_validation = true
+  skip_requesting_account_id  = true
+
+  endpoints {
+    s3                       = "http://aws:4566"
+  }
+}
+
+## terraform.tfvars
+region = "us-east-1"
+## variables.tf
+variable "region" {
+}
+There is a resource block configured in the main.tf file in this configuration directory. What is the resource name that will be provisioned when we run terraform apply?
+==> marvel-cinematic-universe
+What is the current state of this configuration directory?
+==> ressorce provissioned because terraform.tfstate
+What is the name of the s3 bucket that has been created by this configuration?
+==> mcu-202011121359
+What is the DNS domain name that is created for this bucket?
+==> mcu-202011121359.s3.amazon
+Now, let's move on and work on a different configuration directory called DC.
+The main.tf file is empty. Use it to create a new S3 with the following specifications:
+resource name: dc_bucket
+bucket name: dc_is_better_than_marvel
+
+
+Once the resource block is complete, run a terraform init, plan and apply to try and create the bucket.
+
+
+If unsure, refer to the documentation. The documentation tab is available at the top right panel.
+
+(it's ok if you get an error! Move on to the next question!)
+## main.tf
+resource "aws_s3_bucket" "dc_bucket" {
+    bucket ="dc_is_better_than_marvel"
+  
+}
+## provider.tf
+terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+      version = "4.15.0"
+    }
+  }
+}
+
+provider "aws" {
+  region                      = var.region
+  s3_use_path_style = true
+  skip_credentials_validation = true
+  skip_requesting_account_id  = true
+
+  endpoints {
+    s3                       = "http://aws:4566"
+  }
+}
+## terraform.tfvars
+region = "us-east-1"
+## variables.tf
+variable "region" {
+}
+
+Why did the terraform apply command fail?
+aws_s3_bucket.dc_bucket: Creating...
+╷
+│ Error: error creating S3 Bucket (dc_is_better_than_marvel): InvalidBucketName: The specified bucket is not valid.
+│       status code: 400, request id: 422c6cca-d753-4993-a8bc-a69b1e874064, host id: s9lzHYrFp76ZVxRcpX9+5cjAnEH2ROuNkd2BHfIa6UkFVdtjf5mKR3/eTPFvsiP/XV/VLi31234=
+│ 
+│   with aws_s3_bucket.dc_bucket,
+│   on main.tf line 1, in resource "aws_s3_bucket" "dc_bucket":
+│    1: resource "aws_s3_bucket" "dc_bucket" {
+│ 
+╵
+==> InvalidBucketName
+
+That's right! The bucket name we used does not conform to a DNS Name standard as it uses underscores.
+
+Let's fix that now and change the bucket name so that it uses dashes (-) instead of underscore(_).
+
+resource name: dc_bucket
+bucket name: dc-is-better-than-marvel
+
+
+Once the resource block is complete, run a terraform init, plan and apply to try and create the bucket.
+
+resource "aws_s3_bucket" "dc_bucket" {
+     bucket = "dc-is-better-than-marvel" 
+}
+
+
+Let's move on to the next configuration directory called Pixar.
+Same as the directory called DC, we have the provider.tf, variables.tf, terraform.tfvars and an empty main.tf file that is already created.
+
+Change directory to Pixar and move on to the next question.
+
+We have a file called woody.jpg stored at /root that has to be uploaded to a bucket called pixar-studios-2020. This bucket already exists though and was created using the AWS CLI.
+
+
+
+Let's do that now and upload this image to the s3 bucket! Update the main.tf file with the following specifications:
+
+Bucket: pixar-studios-2020
+Key: woody.jpg
+Source: /root/woody.jpg
+Use object (resource) Name: upload
+
+Once ready, proceed to run terraform init, plan and apply.
+==> ## main.tf
+resource "aws_s3_object" "upload" {
+  bucket = "pixar-studios-2020"
+  key    = "woody.jpg"
+  source = "/root/woody.jpg"
+}
+## provider.tf
+terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+      version = "4.15.0"
+    }
+  }
+}
+
+provider "aws" {
+  region                      = var.region
+  s3_use_path_style = true
+  skip_credentials_validation = true
+  skip_requesting_account_id  = true
+
+  endpoints {
+    s3                       = "http://aws:4566"
+  }
+}
+## terraform.tfvars
+region = "us-east-1"
+## variables.tf
+variable "region" {
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
