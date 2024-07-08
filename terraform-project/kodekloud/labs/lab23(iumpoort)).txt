@@ -1,0 +1,252 @@
+Navigate to the directory /root/terraform-projects/project-jade. We have a few resources created using the configuration files.
+
+Inspect them first.
+## main.tf
+resource "aws_instance" "ruby" {
+  ami           = var.ami
+  instance_type = var.instance_type
+  for_each      = var.name
+  key_name      = var.key_name
+  tags = {
+    Name = each.value
+  }
+}
+output "instances" {
+  value = aws_instance.ruby
+}
+## variables.tf
+variable "name" {
+  type    = set(string)
+  default = ["jade-webserver", "jade-lbr", "jade-app1", "jade-agent", "jade-app2"]
+
+}
+variable "ami" {
+  default = "ami-0c9bfc21ac5bf10eb"
+}
+variable "instance_type" {
+  default = "t2.nano"
+}
+variable "key_name" {
+  default = "jade"
+
+}
+## provider.tf
+terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+      version = "4.15.0"
+    }
+  }
+}
+
+provider "aws" {
+  region                      = "us-east-1"
+  skip_credentials_validation = true
+  skip_requesting_account_id  = true
+
+  endpoints {
+    ec2 = "http://aws:4566"
+  }
+}
+
+
+Which of the below resources is not part of this configuration?
+==> EC2 named jade-mw
+What is the name of the ssh key which is used by all of these instances?
+==> jade
+
+Is the key pair resource created by this terraform configuration?
+==> no
+
+That's right, the key called jade has been created using the AWS CLI.
+
+The command used to create this key is aws ec2 create-key-pair --endpoint http://aws:4566 --key-name jade --query 'KeyMaterial' --output text > /root/terraform-projects/project-jade/jade.pem.
+The private key is created in the same configuration directory we have been working on.
+
+==> 
+We have another EC2 instance created called jade-mw using the AWS CLI.
+
+Using the AWS CLI inspect this EC2 instance and find the ID that is created by it.
+
+Here are some of the specifications of this EC2 Instance:
+
+AMI: ami-082b3eca746b12a89
+
+Instance Type: t2.large
+
+Key Name: jade
+
+Remember the syntax to use the AWS CLI: aws command sub-command options
+
+Also make sure to pass in the --endpoint http://aws:4566 (As we are using the AWS test framework. This is not required to interact with actual EC2 instances)
+
+aws ec2 describe-instances --endpoint http://aws:4566
+{
+    "Reservations": [
+        {
+            "Groups": [],
+            "Instances": [
+                {
+                    "AmiLaunchIndex": 0,
+                    "ImageId": "ami-082b3eca746b12a89",
+                    "InstanceId": "i-08248b3c30a690ded",
+                    "InstanceType": "t2.large",
+                    "KernelId": "None",
+                    "KeyName": "jade",
+                    "LaunchTime": "2024-07-08T06:03:41+00:00",
+                    "Monitoring": {
+                        "State": "disabled"
+                    },
+                    "Placement": {
+                        "AvailabilityZone": "us-east-1a",
+                        "GroupName": "",
+                        "Tenancy": "default"
+                    },
+                    "PrivateDnsName": "ip-10-195-62-2.ec2.inter
+nal",
+                    "PrivateIpAddress": "10.195.62.2",
+                    "PublicDnsName": "ec2-54-214-207-238.comput
+e-1.amazonaws.com",
+                    "PublicIpAddress": "54.214.207.238",
+                    "State": {
+                        "Code": 16,
+                        "Name": "running"
+                    },
+                    "StateTransitionReason": "",
+                    "SubnetId": "subnet-f76a9077",
+                    "VpcId": "vpc-1565aad3",
+                    "Architecture": "x86_64",
+                    "BlockDeviceMappings": [
+                        {
+                            "DeviceName": "/dev/sda1",
+                            "Ebs": {
+                                "AttachTime": "2024-07-08T06:03
+:41+00:00",
+                                "DeleteOnTermination": true,
+                                "Status": "in-use",
+                                "VolumeId": "vol-39f43a23"
+:
+
+==> aws ec2 describe-instances --endpoint http://aws:4566 --filters "Name=image-id,Values=ami-082b3eca746b12a89" | jq -r '.Reservations[].Instances[].InstanceId'
+i-08248b3c30a690ded
+
+Let's manage this instance called jade-mw with Terraform! First, create an empty resource block for this instance in the main.tf file in the configuration directory /root/terraform-projects/project-jade
+
+Use jade-mw as the resource name.
+
+
+We will fill in the arguments for this block later.
+
+==> ## main.tf
+resource "aws_instance" "ruby" {
+  ami           = var.ami
+  instance_type = var.instance_type
+  for_each      = var.name
+  key_name      = var.key_name
+  tags = {
+    Name = each.value
+  }
+}
+output "instances" {
+  value = aws_instance.ruby
+}
+resource "aws_instance" "jade-mw" {
+
+}
+
+Now, import this instance into the terraform state.
+
+
+The resource name should be the same as the one used in the previous question - jade-mw
+
+=> Run the terraform import command: terraform import aws_instance.jade-mw id-of-the-resource.
+
+Where, id-of-the-resource is the id of the instance that we determined in the previous question.
+
+Here is the command to fetch the id of the resource: -
+
+aws ec2 describe-instances --endpoint http://aws:4566  --filters "Name=image-id,Values=ami-082b3eca746b12a89" | jq -r '.Reservations[].Instances[].InstanceId'
+
+Great! We are nearly there. What would happen if we run terraform apply?
+
+==> eror ! resource arg not defined
+Let us fix that now. Complete the resource block for jade-mw. Inspect the state to make sure all the arguments used to create this resource are defined in the resource block.
+
+
+If unsure, run terraform apply after filling in the arguments and correct them until a plan shows no changes to apply.
+
+
+You can use the jq tool to display the details of a specific resource instance from the terraform show command.
+
+We are doing this for the jade-mw instance.
+
+
+You can use the jq tool to display the details of a specific resource instance from the terraform show command.
+
+We are doing this for the jade-mw instance.
+
+
+terraform show -json | jq '.values.root_module.resources[] | select(.type == "aws_instance" and .name == "jade-mw")'
+
+
+Or
+
+
+
+You can check the instance details from the aws cli, also: -
+
+
+aws ec2 describe-instances --filters "Name=tag:Name,Values=jade-mw" --query "Reservations[*].Instances[*].[ImageId, InstanceType, KeyName, Tags]" --endpoint http://aws:4566
+
+
+Define the required arguments to create this resource looks like the below: -
+
+
+...
+resource "aws_instance" "jade-mw" {
+  ami           = "ami-082b3eca746b12a89"
+  instance_type = "t2.large"
+  key_name      = "jade"
+  tags = {
+    Name = "jade-mw"
+  }
+
+
+Here ami and instance_type values could be different in your lab environment.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
