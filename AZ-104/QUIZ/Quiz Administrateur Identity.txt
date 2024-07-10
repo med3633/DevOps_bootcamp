@@ -1,0 +1,39 @@
+Which of the following statements is false? Select one.
+==> Microsoft Extra ID uses kerberos
+==> Kerberos is used by Active Directory Domain Services; Microsoft Entra ID uses OAuth authorization.
+Your organization wants to use Identity Governance in Microsoft Entra ID. Which Microsoft Entra ID edition will you recommend for this?
+==> Only Microsoft Entra ID Premium P2 supports Identity Governance
+Abigail is a cloud identity as the user type is Member and Directory synced flag is set to No. Guest identities will have the user type as Guest and Directory synchronized users will have the Directory synced flag set to Yes.
+You would like to add external users to your directory in bulk. Which of the following bulk operations will you use to accomplish this task?
+==>bulk invite
+==>Since you are adding external users, you need to use the “Bulk invite” option. If you are adding cloud identities in bulk, then you need to use the “Bulk create” option.
+
+What is the maximum number of methods we can set for a successful password reset?
+==> Though we can make multiple methods available to the users, we can use one or two methods for password reset; hence, the maximum number is 2.
+Which feature in Microsoft Entra ID can be used to enforce device management?
+==> Microsoft Entra ID Join can be used to join our devices to Microsoft Entra ID using Work or School account for device management.
+If you are deleting a user from Microsoft Entra ID, how long will Microsoft Entra ID retain the user?
+==> 30 days
+==> Microsoft Entra ID will retain the deleted user for 30 days. During that time, you can restore the user if needed.
+With Microsoft Entra ID Free edition, we can have B2B collaboration. True or False?
+==> true
+Which protocol is used by Active Directory Domain Services for querying objects?
+==> LDAP
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
