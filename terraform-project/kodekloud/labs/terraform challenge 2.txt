@@ -1,0 +1,52 @@
+install terraform => curl -L -o -0 /tmp/terraform_1.1.5_linux_amd64.zip https://releases.hashicorp.com/terraform/1.1.5/terraform_1.1.5_linux_amd64.zip
+iac-server $ ls /tmp/
+systemd-private-a585a643ff5c447dbab44c368edd7411-systemd-resolved.service-Ee2wjh terraform_1.1.5_linux_amd64.zip
+iac-server $
+iac-server $ unzip -d /usr/local/bin/ /tmp/terraform_1.1.5_linux_amd64.zip 
+## provider.tf
+terraform {
+required providers {
+docker = {
+source = "kreuzwerker/docker"
+version="2.16.0"
+}
+}}
+provider "docker" {}
+## docker_network.tf
+resource "docker_network" "private_network" {
+  name       = "my_network"
+  attachable = true
+  labels {
+    label = "challenge"
+    value = "second"
+  }
+}
+
+## db.tf
+resource "docker_container" "mariadb" {
+  name     = "db"
+  image    = docker_image.mariadb-image.name
+  hostname = "db"
+  networks_advanced {
+    name = docker_network.private_network.id
+  }
+  ports {
+    internal = 3306
+    external = 3306
+    ip       = "0.0.0.0"
+  }
+  labels {
+    label = "challenge"
+    value = "second"
+  }
+  env = [
+    "MYSQL_ROOT_PASSWORD=1234",
+    "MYSQL_DATABASE=simple-website"
+  ]
+  volumes {
+    container_path = "/var/lib/mysql"
+    volume_name    = docker_volume.mariadb_volume.name
+  }
+}
+
+https://gitlab.com/nb-tech-support/devops/-/tree/master/Terraform%20Challenge%20Series/Terraform%20Challenge%202

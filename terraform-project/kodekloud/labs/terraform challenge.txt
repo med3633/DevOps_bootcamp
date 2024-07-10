@@ -1,0 +1,71 @@
+Welcome to the terraform challenge series.
+In this challenge we will deploy several Kubernetes resources using terraform.
+Utilize /root/terraform_challenge directory to store your Terraform configuration files.
+
+
+Inspect the requirements in detail by clicking on the icons of the interactive architecture diagram on the right and complete the tasks. Once done click on the Check button to validate your work.
+
+## provider.tf
+terraform {
+required_providers {
+kubernetes = {
+source= "hashicorp/kubernetes"
+version="2.11.0"
+}
+}
+}
+provider "kubernetes" {
+config_path = "/root/.kube/config"
+}
+
+## frontend.tf
+resource "kubernetes_deployment" "frontend" {
+metadata {
+name = "frontend"
+labels = {
+name = "frontend"
+}
+}
+spec {
+replicas = 4
+selector {
+match_labels = {
+name = "webapp"
+}
+}
+template {
+metadata {
+labels = {
+name = "webapp"
+}
+}
+spec {
+container {
+image = "kodekloud/webapp-color:v1"
+name = "simple-webapp"
+port {
+container_port = 8080
+}
+}
+}
+}}}
+
+## webapp-service.tf
+resource "kubernetes_service" "webapp-service" {
+metadata {
+name = "webapp-service"
+}
+spec {
+selector = {
+name = kubernetes_deployment.frontend.spec.0.template.0.metadata.0.labels.name
+}
+port {
+port = 8080
+target_port = 8080
+node_port = 30080
+}
+type = "NodePort"
+}
+}
+
+
