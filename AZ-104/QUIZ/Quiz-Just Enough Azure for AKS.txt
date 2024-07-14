@@ -1,0 +1,47 @@
+Which of the following best describes Azure Landing Zone?
+=> A set of best practices and guidelines for building a well-architected Azure foundation.
+Which Azure service allows you to run Windows and Linux virtual machines?
+==> Azure virtual Machine
+What is the primary purpose of Azure Blob storage?
+==> storing large amounts of unstructured data, such files and images
+Which Azure database service provides a fully managed, globally distributed NoSQL database?
+==> Azure Cosmos db
+What is the recommended approach for implementing governance and security controls in Azure Landing Zone?
+==> Following the Azure Well-Architected Framework and Azure policy for governance
+Which Azure storage service provides a durable and highly available file system in the cloud?
+=> Azure file storage
+Which Azure service provides a fully managed, relational database service for running SQL Server workloads in the cloud?
+=> Azure SQL database
+What are the benefits of using Azure Landing Zone? Select all that apply.
+==> consistent governance and management , improved security and compliance
+What is the purpose of Azure Virtual Machine Scale Sets?
+==> to scale horizontal based on demand
+Which Azure service provides a platform for building, deploying, and managing containerized applications?
+==> Azure Kubernetes Services AKS
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
