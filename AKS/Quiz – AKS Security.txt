@@ -1,0 +1,59 @@
+What is Open Service Mesh (OSM) in the context of Azure Kubernetes Service (AKS)?
+==> Open Service Mesh (OSM) is an open-source, cloud-native service mesh implementation that can be used with AKS. It provides capabilities for managing and securing microservices-based applications running on AKS clusters.
+What is the role of Azure Active Directory (AAD) in AKS?
+==> Azure Active Directory (AAD) enables authentication and authorization of users and applications accessing AKS clusters. It provides identity and access management capabilities, allowing fine-grained control (using RBAC) over who can access the cluster and what actions they can perform.
+What does Azure Defender offer in conjunction with AKS?
+==> Azure Defender provides real-time threat detection and response capabilities for AKS clusters. It helps identify and protect against common threats and vulnerabilities, providing enhanced security for your AKS deployments.
+What is the purpose of Azure Policy for AKS?
+==> Azure Policy for AKS allows you to define and enforce organizational standards and best practices for AKS clusters. It helps ensure that AKS resources and configurations align with specific policies, improving consistency and compliance across the cluster.
+Which of the following components are typically included in a service mesh architecture?
+==> Data plane and control plane 
+How does Azure Defender for AKS protect against security threats?
+==> Azure Defender for AKS helps protect against security threats by detecting and responding to security events and vulnerabilities in AKS clusters. It provides real-time threat detection and offers recommendations for remediation.
+How does Azure Policy complement Azure Defender in securing AKS clusters?
+==> Azure Policy and Azure Defender have different roles in securing AKS clusters. Azure Policy focuses on enforcing compliance rules and organizational standards, ensuring that AKS clusters meet specific requirements. Azure Defender, on the other hand, provides threat detection and response capabilities, identifying security events and vulnerabilities. Both tools work together to enhance the security posture of AKS clusters.
+Which authentication method does AKS support for user access control?
+==> AKS supports multiple authentication methods, including Azure Active Directory (AAD), JSON Web Tokens (JWT), and X.509 client certificates, allowing for flexible user access control options.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

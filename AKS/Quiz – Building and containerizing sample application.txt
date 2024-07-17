@@ -1,0 +1,59 @@
+What is containerization?
+==> A technique to package application with their dependencies
+Which tool is commonly used to containerize applications?
+==> Docker
+What is a local k8s cluster?
+==> A k8s cluster running on a local developpement machine 
+How can you run the sample ASP.NET Core Web App on a local k8s cluster?
+==> use the kubectl command-line tool
+Which editors are commonly used for developing C# web applications?
+==> All
+Which statement correctly describes Dockerfile?
+==> It is a configuration file used to define the steps to build a Dockerr images
+What is the purpose of the "RUN" instruction in a Dockerfile?
+==> its installs dependencies and executes commands during the image build process
+What is the purpose of the "ENTRYPOINT" instruction in a Dockerfile?
+==> It specifies the commands and parameters to be executed when a containers is started
+Which command is used to build a Docker image from a Dockerfile?
+==> docker build
+How can you specify the target port within a container when mapping ports using the "docker run" command?
+==> use the --publish or -p flag with the <host port>:<container port>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

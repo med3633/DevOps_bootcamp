@@ -1,0 +1,70 @@
+What is Azure Container Registry (ACR)?
+==> A plateform for managing container images
+What is the purpose of a Kubernetes namespace?
+==> to isolate differnent deployments or teams within the same cluster
+How can you expose a service deployed on AKS to external traffic?
+==> by creating an external LB service 
+What is Azure Kubernetes Fleet?
+==> A managed service for deploying and managing multiple AKS clusters
+How do you push an image to ACR?
+==> docker push
+What does ACR stand for in the context of AKS?
+==> Azure Container Registry
+How can you scale the nodes in an AKS cluster using Azure CLI?
+==> az aks scale 
+Which tool is commonly used to deploy applications to an AKS cluster?
+==> kubectl
+How do you deploy an AKS cluster?
+==> Azure cli , Azure portal
+What is a pod in Kubernetes?
+==> the smallest unit in deployment k8s
+How can you enable automatic scaling of pods in AKS?
+==> by configuring the horizontal pod autoscaling(HBA)
+In Azure Kubernetes Service (AKS), what is the default namespace where resources are deployed if no namespace is specified?
+==> default 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

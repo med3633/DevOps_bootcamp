@@ -1,0 +1,57 @@
+What is the purpose of Azure Networking in the context of AKS?
+==>  to establish network connectivity between AKS clusters and external ressources
+Which networking option allows secure communication between AKS clusters and on-premises resources?
+==> Azure Private Link allows secure and private communication between AKS clusters and on-premises resources by establishing a private connection through the Azure backbone network, without exposing services to the public internet.
+What is a network policy in AKS?
+==> A set of rules that control intbound and outbound traffic for AKS pods
+Which networking option in AKS allows you to expose services to the public internet with a static public IP address?
+==> Azure Application Gateway in AKS enables you to expose services to the public internet with a static public IP address. It acts as a load balancer and provides advanced application delivery capabilities.
+Which networking option in AKS enables you to limit traffic to specific IP addresses/ranges and ports?
+==> Network Security grp
+How can you enforce network policies in AKS?
+==> Network policies in AKS are enforced by creating and applying network policy objects in Kubernetes. These objects define the allowed or denied traffic between pods based on labels and selector
+What are the two networking options available for Azure Kubernetes Service (AKS) to manage networking between pods?
+==> kubenet and Azure Container Network Ineterface (CNI)
+Which YAML file format is commonly used to define and apply policies in Azure Kubernetes Service (AKS)?
+==> k8s manifest 
+What is the difference between Azure Network Policies and Calico Network Policies in Azure Kubernetes Service (AKS) regarding their compatibility with the underlying networking options, Kubenet and Container Networking Interface (CNI)?
+==> Calico Policies are compatible with both Kubenet and CNI as the underlying networking options in AKS. They can be used to enforce network security policies within the cluster, regardless of whether Kubenet or CNI is being utilized.
+In Azure, which statement best describes the relationship between subnets and virtual networks (VNets)?
+==> A VNET is a virtual network that can contain multiple subnets, each representing a segmented IP address range within the VNet.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
