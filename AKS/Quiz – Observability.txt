@@ -1,0 +1,51 @@
+Which Azure service is commonly used for logging and monitoring in AKS?
+==> Azure Monitor is commonly used for logging and monitoring in AKS. It provides a comprehensive solution for collecting, analyzing, and acting on telemetry data from AKS clusters.
+How can you view logs in AKS using Container Insights?
+==> To view logs in AKS using Container Insights, you can use the Azure portal and navigate to the Container Insights page of your AKS cluster. It provides a user-friendly interface to explore and analyze logs.
+What is the purpose of Prometheus in AKS?
+==> Prometheus is a popular open-source monitoring and alerting system commonly used in AKS. It is designed for collecting metrics from applications and infrastructure components, enabling observability and performance monitoring.
+What is Grafana used for in AKS?
+==> Grafana is a popular open-source platform used for visualizing metrics and creating dashboards. It is commonly integrated with Prometheus in AKS to provide a user-friendly interface for monitoring and visualization.
+Which query language is commonly used with Prometheus for querying metrics data?
+==> PromQL
+Which component of Azure Monitor is responsible for collecting metrics from AKS?
+==> Azure Monitor for Containers is the component of Azure Monitor responsible for collecting metrics from AKS. It collects performance and diagnostic data from the containers running in AKS clusters.
+How can you configure Azure Monitor for AKS?
+==> use the azure portal and enable azure monitor for containers integration 
+What is the primary benefit of using Azure Monitor for AKS?
+The primary benefit of using Azure Monitor for AKS is centralized logging and monitoring. It provides a unified solution for collecting, analyzing, and acting on telemetry data from AKS clusters, enabling efficient troubleshooting and performance monitoring.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

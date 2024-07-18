@@ -1,0 +1,54 @@
+Which of the following statements accurately describes Kustomize in relation to Azure Kubernetes Service (AKS)?
+==> Kustomize is not a built-in feature of AKS but rather a standalone tool. It allows you to define and manage Kubernetes application configurations in a declarative manner. With Kustomize, you can customize and overlay configurations for different environments or variations of the same application, making it a powerful tool for managing deployments in AKS.
+In a pull-based deployment workflow using Azure Kubernetes Service (AKS), which component is responsible for continuously monitoring the Git repository and applying the desired state changes to the AKS cluster?
+==> In a pull-based deployment workflow, the Flux Operator is responsible for continuously monitoring the Git repository. It pulls the desired state changes from the repository and applies them to the AKS cluster, ensuring that the actual state of the cluster matches the desired state specified in the repository. The Flux Operator acts as the bridge between the Git repository and the AKS cluster, orchestrating the synchronization of changes in a pull-based manner.
+Which Azure DevOps feature enables push-based deployment of containerized applications to Azure Kubernetes Service (AKS)?
+==> Azure Pipelines is a feature of Azure DevOps that enables push-based deployment of containerized applications to Azure Kubernetes Service (AKS). It allows you to define CI/CD pipelines that automatically build, test, and deploy container images to AKS when changes are pushed to the repository. Azure Pipelines integrates well with AKS and provides a seamless workflow for continuous deployment to Kubernetes clusters.
+Which component of Flux is responsible for synchronizing the desired state defined in a Git repository with the actual state of an AKS cluster?
+==> flux controller
+What is the primary purpose of Flux in the context of GitOps?
+==> Flux is primarily designed to enable continuous deployment in the GitOps workflow. It automates the process of pulling changes from a Git repository and applying them to the Kubernetes cluster, ensuring that the actual state matches the desired state defined in the repository.
+Which method involves manually specifying each step to create and manage resources in AKS?
+==> imperatif methode
+Which workflow promotes a "pull request" model for reviewing and approving changes before they are applied to the AKS cluster?
+==> In a pull-based workflow, changes are submitted as pull requests, and they go through a review and approval process before being merged and applied to the AKS cluster. This workflow ensures that changes are thoroughly reviewed before deployment.
+Which method involves the use of Kubernetes manifests (YAML files) to define the desired state of applications in AKS?
+==> Using Kubernetes manifests, you can define the desired state of your applications, such as deployment specifications, service configurations, and other resources. The Kubernetes control plane then ensures the cluster matches the desired state.
+Which workflow is characterized by triggering deployments through events, such as code pushes or pull requests?
+==> In a push-based or gitops workflow, whenever there is a code push or a pull request, the CI/CD pipeline is triggered, and the new changes are built, tested, and deployed to the AKS cluster.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
