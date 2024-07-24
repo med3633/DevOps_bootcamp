@@ -1,0 +1,81 @@
+What would be the output for the following program:
+
+
+package main
+
+import "fmt"
+
+func main() {
+        var a, b bool = true, false
+        fmt.Println(a && b)
+        fmt.Println(a || b)
+}
+==> false , true
+
+What would be the output for the following program:
+
+
+package main
+
+import "fmt"
+
+func main() {
+        var a, b bool = false, false
+        fmt.Println(a && b)
+        fmt.Println(a || b)
+}
+=> false , false 
+
+What would be the output for the following program:
+
+
+package main
+
+import "fmt"
+
+func main() {
+        var a, b bool = false, true
+        fmt.Println(!a)
+        fmt.Println(b)
+}
+==> true , true
+
+
+
+
+What would be the output for the following program:
+
+
+package main
+
+import "fmt"
+
+func main() {
+        var a bool = false
+        result := 10 > 50
+        fmt.Println(!(a && result))
+}
+==> true
+
+What would be the output for the following program:
+
+
+package main
+
+import "fmt"
+
+func main() {
+        var a bool = true
+        result := 10 > 50
+        fmt.Println(!(a || result))
+}
+==> false
+
+
+
+
+
+
+
+
+

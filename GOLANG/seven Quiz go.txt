@@ -1,0 +1,78 @@
+What would be the output of the following comparison -
+
+
+var a, b string = "Cat", "cat"
+fmt.Println(a == b)
+==> false
+
+What would be the output of the following comparison -
+
+
+var a string = "cat"
+var b int = 12
+fmt.Println(a == b)
+==> error
+
+What would be the output of the following comparison -
+
+
+var a int = 12
+var b int = 12
+fmt.Println(a != b)
+==> false
+
+What would be the output of the following comparison -
+
+
+func main() {
+        var a int = 12
+        var b int = 12
+        fmt.Println(a <= b)
+
+        a = 20
+        fmt.Println(a <= b)
+
+        b = 100
+        fmt.Println(a <= b)
+
+        c := 0
+        fmt.Println(a <= c)
+
+}
+==> true,false,true,false
+
+Which operator can you use to validate if two values are not equal
+==> !=
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,69 @@
+What would be the output of the following code:
+
+
+package main
+
+import "fmt"
+
+func main() {
+        var a string = "one"
+        var b int = 2
+        fmt.Print(a + b)
+}
+==> error
+
+What would be the output of the following code:
+
+
+package main
+
+import "fmt"
+
+func main() {
+        var a float64 = 5.9
+        var b int = 2
+        fmt.Print(a + b)
+}
+==> error
+
+What would be the output of the following code:
+
+
+package main
+
+import "fmt"
+
+func main() {
+        var a float64 = 5.9
+        a++
+        fmt.Print(a)
+}
+==> 6.9
+
+What would be the output of the following code:
+
+
+package main
+
+import "fmt"
+
+func main() {
+        var a int = 10
+        a--
+        fmt.Print(a)
+}
+==> 9
+
+What would be the output of the following code:
+
+
+package main
+
+import "fmt"
+
+func main() {
+        var a, b float64 = 24.4, 3.0
+        fmt.Println(a / b)
+        fmt.Println(int(a) % int(b))
+}
+==> 8.1313..... , 0
