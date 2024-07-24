@@ -1,0 +1,96 @@
+A constant is initialised using the keyword:
+==> const
+Select the valid statements for declaring and initialising a constant
+
+
+A. const c int = "mouse"
+
+
+B. const c int = 90
+
+
+C. const c = 90
+
+
+D. const c int = 90.00
+==> B,C
+Select the correct statements
+
+
+A.
+
+const c int = 70
+
+
+
+B.
+
+const c int
+c = 70
+
+
+
+C.
+
+var c int
+c = 70
+
+
+
+D.
+
+constant c = 70
+
+==> A,C
+
+Can you use shorthand declaration for declaring constants (:=)
+=> No
+
+Which of the following statement will throw an error
+
+
+A.
+
+const name = "Harry"
+fmt.Print(name)
+
+
+
+B.
+
+var name = "Harry"
+fmt.Print(name)
+
+
+
+C.
+
+const name = "Harry"
+name = "Snape"
+fmt.Print(name)
+
+
+
+D.
+
+var name string = "Harry"
+fmt.Print(name)
+==> C
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

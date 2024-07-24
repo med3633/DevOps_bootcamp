@@ -1,0 +1,86 @@
+Which of these can be considered as Boolean Values in Golang
+==> true , false 
+
+Choose the correct keyword(s) for declaring a Float in Golang
+
+
+A. float32
+
+
+B. float64
+
+
+C. float
+
+
+D. floating
+==> A,B
+
+Choose the datatype(s) supported for numbers in Golang
+
+
+A. float64
+
+
+B. floating
+
+
+C. int
+
+
+D. int32
+==> A,C,D
+
+Choose the correct keyword(s) for declaring a Booleans in Golang
+==> bool
+
+Which of the following literals come under String
+
+
+A. "hello"
+
+
+B. "operators"
+
+
+C. 45.99
+
+
+D. "45.99"
+
+==> A,B,D
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,101 @@
+Which of the following languages are statically typed?
+
+
+A. Java
+
+
+B. C
+
+
+C. C++
+
+
+D. Python
+==> A,B,C
+
+Which of the following languages are dynamically typed?
+
+
+A. C++
+
+
+B. Python
+
+
+C. Javascript
+
+
+D. PHP
+==> B,C,D
+
+Choose the correct statements
+
+
+A. Type checking process occurs at compile time for static typed languages.
+
+
+B. Type checking process occurs at runtime for static typed languages.
+
+
+C. Type checking process occurs at compile time for runtime typed languages.
+
+
+D. Type checking process occurs at runtime for dynamic typed languages.
+
+==> A,D
+
+In dynamic typing, a variable is allowed to change its data type
+==> True
+
+In static typing, a variable is allowed to change its data type
+==> False 
+
+A sample go program is stored under /root/code/simple-project. Inspect it.
+package main
+
+import "fmt"
+
+func main() {
+
+	title := "Sir"
+	fmt.Println(title)
+}
+What is the data type assigned to the variable called title?
+
+You can run this program and print the value by running go run main.go inside the directory.
+==> String
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

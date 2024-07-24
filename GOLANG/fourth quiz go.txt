@@ -1,0 +1,274 @@
+What would be the valid statement for initialising a variable:
+==> var name string = "lia"
+Select all the correct statements for variable initialisation -
+
+
+A. var name string = "Lia"
+
+
+B. name := "Lia"
+
+
+C. var s, t string = "Lia", "Harry"
+
+
+D. var b bool = "false"
+==> A,B,C
+
+Select the statements that would print and then introduce a new line in the output:
+
+
+A. fmt.Print(name)
+
+
+B. fmt.Print("Hey there \n")
+
+
+C. fmt.Println("Hey there")
+
+
+D. fmt.Printf(name)
+==> B,C
+
+Consider the following code snippet and select the correct output:
+
+
+package main
+
+import "fmt"
+
+const PI float64 = 3.14 // global constant
+
+func main() {
+    var radius float64 = 5.154
+    var area float64
+
+    area = PI * radius * radius
+    fmt.Printf("Radius: %.2f \nPI:%.1f \n", radius, PI)
+    fmt.Printf("Area of Circle is : %f", area)
+    fmt.Println("Thank You")
+}
+
+
+
+A.
+
+Radius: 5.154 
+PI:3.1 
+Area of Circle is : 83.410068
+Thank You
+
+
+
+B.
+
+Radius: 5.15 
+PI:3.14 
+Area of Circle is : 83.410068Thank You
+
+
+
+C.
+
+Radius: 5.15 
+PI:3.1 
+Area of Circle is : 83.410068
+Thank You
+
+
+
+D.
+
+Radius: 5.15 
+PI:3.1 
+Area of Circle is : 83.410068Thank You
+==> D
+
+What is the correct format specifier for printing a string with quotes
+==> %q
+
+Among the following code snippets - select the correct ways of initializing variables
+
+
+A.
+
+var name := "Priyanka"
+
+
+
+B.
+
+var s,t string,int = "Priyanka", 100
+
+
+
+C.
+
+var (
+s string = "Priyanka"
+i int = 100
+)
+
+
+
+D.
+
+var i,j int = 100, 200
+
+==> C,D
+
+
+Select the correct statement
+
+
+A. Inner blocks can access variables of outer blocks.
+
+
+B. Outer blocks can access variables within inner blocks.
+
+
+C. Outer blocks cannot access variables within inner blocks.
+
+
+D. Inner blocks can not access variables of outer blocks.
+
+==> A,C
+
+From the following code snippet, identify the local and global variable -
+
+
+package main
+
+var a string = "foo"
+
+func main() {
+    var b string = "bar"
+    {
+        var c string = "loreum"
+    }
+}
+
+
+
+A.
+
+a, b - global
+c - local
+
+
+
+B.
+
+a, b, c - local
+
+
+
+C.
+
+a, b, c - global
+
+
+
+D.
+
+a - global
+b, c - local
+==> D
+
+From the following code snippet - which line will cause error
+
+1. package main
+2. 
+3. import "fmt"
+4. 
+5. var a string = "foo"
+6. 
+7. func main() {
+8.    var b string = "bar"
+9.    fmt.Println(a)
+10.   fmt.Println(b)
+11.   fmt.Println(c)
+12.  {
+13.       var c string = "loreum"
+14.       fmt.Println(a)
+15.       fmt.Println(b)
+16.       fmt.Println(c)
+17.  }
+18. }
+==> line 11
+
+What is the zero value for the following variables:
+
+
+var name string
+var b bool
+var f float64
+
+
+
+A.
+
+""
+true
+1.0
+
+
+
+B.
+
+" "
+false
+1.0
+
+
+
+C.
+
+"" 
+false
+0.00
+
+
+
+D.
+
+""
+true
+0.0
+
+==> C
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

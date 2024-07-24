@@ -1,0 +1,181 @@
+Which of the following methods is used to take input from user?
+==> fmt.Scanf
+What does the Scanf function return:
+
+
+A. It returns the number of arguments that the function writes to
+
+
+B. It returns a boolean variable denoting if the function was successful or not
+
+
+C. It returns the error thrown during the execution of the program
+
+
+D. It does not return anything.
+==> A,C
+
+From the following code snippets - select the correct one that takes in multiple inputs and is syntactically correct
+
+
+A.
+
+var name string
+var b bool
+
+fmt.Scanf("%s", &name)
+fmt.Scanf("%t", &b)
+
+
+
+B.
+
+var name string
+var b bool
+
+fmt.Scanf("%t", name)
+fmt.Scanf("t", b)
+
+
+
+C.
+
+var name string
+var b bool
+
+fmt.Scanf("%s %t", &name, &b)
+
+
+
+D.
+
+var name string
+var b bool
+
+fmt.Scanf("%d %t", name, b)
+
+==> A,C
+
+Select the correct code snippet for determining type of variable:
+
+
+A.
+
+var grades int = 42
+fmt.Printf("variable grades = %v is of type %v \n", grades, grades)
+
+
+
+B.
+
+var grades int = 42
+fmt.Printf("variable grades = %v is of type %t \n", grades, grades)
+
+
+
+C.
+
+var grades int = 42
+fmt.Printf("variable grades = %v is of type %T \n", grades, grades)
+
+
+
+D.
+
+var grades int = 42
+fmt.Printf("variable grades = %v is of type %v \n", grades, type(grades))
+==> C
+
+The function TypeOf() - used for determining data type of a variable belongs to which package -
+==> reflect
+
+We can use reflect.TypeOf() to determine type of a :
+==> a literal , a variable , a constant 
+
+What is Type casting
+==> the process of converting one data type to another
+
+Select the correct statement to convert an integer to string
+
+
+A.
+
+var i int = 70
+str := strconv.Atoi(i)
+fmt.Println(str)
+
+
+
+B.
+
+var i int = 70
+str := fmt.Atoi(i)
+fmt.Println(str)
+
+
+
+C.
+
+var i int = 70
+str := strconv.Itoa(i)
+fmt.Println(str)
+
+
+
+D.
+
+var i int = 70
+str := fmt.Itoa(i)
+fmt.Println(str)
+==> C
+
+he package and function used for converting a string to integer is
+==> strconv.Atoi()
+
+Select the correct ways to convert an integer to float:
+
+
+A.
+
+var i int = 88
+f := float32(i)
+
+
+
+B.
+
+var i int = 88
+f := float64(i)
+
+
+
+C.
+
+var i int = 88
+f := float(i)
+
+
+
+D.
+
+var i int = 88
+f := float34(i)
+==> A,B
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

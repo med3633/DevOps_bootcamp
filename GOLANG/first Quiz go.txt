@@ -1,0 +1,169 @@
+Where was the Go programming language designed ?
+==> google
+Go was created to support the following:
+
+
+A. the ease of programming of an interpreted, dynamically typed language
+
+
+B. for creating web pages easily.
+
+
+C. provide the efficiency and safety of a statically typed, compiled language.
+
+
+D. aimed to be modern, with support for networked and multicore computing.
+==> A,C,D
+Go is
+==> compile language
+
+What is a package in go ?
+
+
+A. a file that ends with .mod extension.
+
+
+B. a file that ends with .go extension.
+
+
+C. a collection of files that live in the same directory and have the same package statement at the beginning.
+
+
+D. Set of core packages to enhance and extend the language.
+==> C
+
+In a Go program, where are packages declared ?
+==> at the start of the program
+
+Choose the correct format of importing a package in Go:
+==> import "fmt"
+
+What is the entry point in a Go program ?
+==> the main function
+
+Which package consists of main() function ?
+==> package main
+
+Our program began with package main, what would the files in the fmt package begin with ?
+==> package fmt
+
+Choose the correct syntax to write a comment in Go
+
+
+A.
+
+# this is a comment
+
+
+
+B.
+
+// this is a comment 
+
+
+
+C.
+
+/*
+this is
+a multiline
+comment
+*/
+
+
+
+D.
+
+"""
+this is a
+multiline
+comment
+"""
+
+==> B,C
+
+Now let's run some go commands using the terminal. Open a new terminal and identify the version of go installed.
+==> go version
+
+Which of the following command is not valid ?
+
+If unsure, run go help and check out the commands and their uses.
+==> go compile
+
+A simple go program has been created for you at the location /root/code/simple-project. However, there is an error in the code.
+
+
+Identify and fix the problem.
+==> There is a syntax error at line 2. The package name should be enclosed inside double quotes.
+
+Update the code as below:
+
+package main
+import "fmt"
+
+func main() {
+    fmt.Println("Hurray! My very first go program!")
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
