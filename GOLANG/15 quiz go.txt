@@ -1,0 +1,149 @@
+Select the correct statement(s) for initialising an array.
+
+
+A. var arr [5]string := [5]string {}
+
+
+B. var arr [5]string = [5]string {}
+
+
+C. arr := [5]string {}
+
+
+D. var arr := […]string {}
+==> B,C
+
+What is the length and capacity of [1, 2, 3, 4]
+=> cap,len=4
+
+What would be the output of the following program:
+
+package main
+
+import "fmt"
+
+func main() {
+        arr := [...]string{1, 2, 3, 4, 5}
+        fmt.Println(arr)
+}
+==> Error
+
+What would be the output of the following program:
+
+package main
+
+import "fmt"
+
+func main() {
+        arr := [5]bool{true, true, true, true}
+        for i := 0; i < len(arr); i++ {
+                if arr[i] {
+                        fmt.Println(i)
+                }
+        }
+}
+==> 0,1,2,3
+
+What would be the output of the following program:
+
+package main
+
+import "fmt"
+
+func main() {
+        arr := [5]bool{true, true}
+        fmt.Println(arr)
+}
+==> [true,true,false,false,false]
+
+What would be the output of the following program:
+
+package main
+
+import "fmt"
+
+func main() {
+        arr := [4]int{10, 20, 30, 50, 90}
+        fmt.Println(arr)
+}
+==> Error
+
+What would be the output of the following program:
+
+package main
+
+import "fmt"
+
+func main() {
+        arr := [10]int{10, 20, 30, 50}
+        fmt.Println(arr)
+        fmt.Println(len(arr))
+}
+==> [10,20,30,50,0,0,0,0,0,0]
+10
+
+What would be the output of the following program:
+
+package main
+
+import "fmt"
+
+func main() {
+        arr := [10]int{10, 20, 30, 50}
+        fmt.Println(arr[0])
+        fmt.Println(arr[2])
+        fmt.Println(arr[4])
+        fmt.Println(arr[8])
+        fmt.Println(arr[10])
+}
+==> Error
+
+What would be the output of the following program:
+
+package main
+
+import "fmt"
+
+func main() {
+        arr := [5]string{"a", "b", "c"}
+        for index, element := range arr {
+                fmt.Println(index, "->", element)
+        }
+}
+==> 0->a,1->b,2->c,3-> , 4->
+
+What would be the output of the following program:
+
+package main
+
+import "fmt"
+
+func main() {
+        arr := [5][2]string{{"a"}, {"b"}, {"c"}}
+        fmt.Println(arr[0][0])
+        fmt.Println(arr[1][1])
+        fmt.Println(arr[2][0])
+}
+==> a, , ,c
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
