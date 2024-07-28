@@ -1,0 +1,92 @@
+What would be the output of the following program:
+
+package main
+
+import "fmt"
+
+func main() {
+        var ascii_codes map[string]int
+        ascii_codes["A"] = 65
+        fmt.Println(ascii_codes)
+}
+==> Error
+
+What would be the output of the following program:
+
+package main
+
+import "fmt"
+
+func main() {
+        ascii_codes := map[string]string{}
+        ascii_codes["A"] = 65
+        fmt.Println(ascii_codes)
+}
+==> Error
+
+What would be the output of the following program:
+
+package main
+
+import "fmt"
+
+func main() {
+        ascii_codes := map[string]int{}
+        ascii_codes["A"] = 6
+        _, found := ascii_codes["B"]
+        if found {
+                fmt.Println("key B was not found")
+        }
+}
+==> no output
+
+Follow the given steps and select the correct output
+
+- create a map using make() function with key data type as string, and value data type as int.
+- add the following key_value pairs to it
+("A", 65)
+("F", 70)
+("K", 75)
+- delete the key "F"
+- print the map
+==> map[A:65,B:75]
+
+Follow the given steps and select the correct output
+
+
+package main
+
+import "fmt"
+
+func main() {
+        ascii_codes := make(map[string]int)
+        ascii_codes["A"] = 65
+        ascii_codes["F"] = 70
+        ascii_codes["K"] = 75
+        fmt.Println(ascii_codes)
+
+        ascii_codes = make(map[string]int)
+        ascii_codes["U"] = 85
+        fmt.Println(ascii_codes)
+}
+==> 
+
+Follow the given steps and select the correct output
+
+package main
+
+import "fmt"
+
+func main() {
+        ascii_codes := make(map[string]int, 10)
+        ascii_codes["A"] = 65
+        ascii_codes["F"] = 70
+        ascii_codes["K"] = 75
+        fmt.Println(len(ascii_codes))
+        ascii_codes = make(map[string]int)
+        ascii_codes["U"] = 85
+        fmt.Println(len(ascii_codes))
+}
+==> 3
+1
+
