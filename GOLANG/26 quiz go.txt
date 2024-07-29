@@ -1,0 +1,118 @@
+What would be the output of the following program:
+
+
+Note: add package and import statements as needed
+
+func modify(numbers ...int) {
+        for i := range numbers {
+                numbers[i] -= 5
+        }
+}
+func main() {
+        arr := []int{10, 20, 30}
+        fmt.Println(arr)
+        modify(arr...)
+        fmt.Println(arr)
+}
+==> [10 20 30]
+[5 15 25]
+
+What would be the output of the following program:
+
+
+Note: add package and import statements as needed
+
+func modify(numbers [3]int) {
+        for i := range numbers {
+                numbers[i] -= 5
+        }
+}
+func main() {
+        arr := [3]int{10, 20, 30}
+        fmt.Println(arr)
+        modify(arr)
+        fmt.Println(arr)
+}
+==> [10 20 30]
+ [10 20 30]
+
+What would be the output of the following program:
+
+
+Note: add package and import statements as needed
+
+func modify(numbers *[3]int) {
+        for i := range numbers {
+                numbers[i] -= 5
+        }
+}
+func main() {
+        arr := [3]int{10, 20, 30}
+        fmt.Println(arr)
+        modify(arr)
+        fmt.Println(arr)
+}
+==> Error
+
+What would be the output of the following program:
+
+
+Note: add package and import statements as needed
+
+func modify(s *string) {
+        *s = strings.ToUpper(*s)
+}
+func main() {
+        s := "hello"
+        fmt.Println(s)
+        modify(&s)
+        fmt.Println(s)
+}
+==> hello
+ HELLO
+
+What would be the output of the following program:
+
+
+Note: add package and import statements as needed
+
+func modify(s map[string]int) {
+        s["A"] = 100
+}
+func main() {
+        ascii_codes := map[string]int{}
+        ascii_codes["A"] = 65
+        fmt.Println(ascii_codes)
+        modify(ascii_codes)
+        fmt.Println(ascii_codes)
+}
+==> map[A:65]
+ map[A:100]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

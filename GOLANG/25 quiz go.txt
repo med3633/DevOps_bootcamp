@@ -1,0 +1,140 @@
+What would be the output of the following program:
+
+
+Note: add package and import statements as needed
+
+func modify(y int) int {
+        y += 15
+        return y
+}
+func main() {
+        y := 20
+        modify(y)
+        fmt.Println(y)
+}
+==> 20
+
+What would be the output of the following program:
+
+
+Note: add package and import statements as needed
+
+func main() {
+        y := [3]int{10, 20, 30}
+        py := &y
+        fmt.Printf("%T %v \n", py, *py)
+}
+==> *[3]int [10 20 30]
+
+What would be the output of the following program:
+
+
+Note: add package and import statements as needed
+
+func main() {
+        y := [3]int{10, 20, 30}
+        fmt.Printf("%v \n", y)
+        (*&y)[0] = 100
+        fmt.Printf("%v \n", y)
+}
+==> [10 20 30]
+[100 20 30]
+
+What would be the output of the following program:
+
+
+Note: add package and import statements as needed
+
+func main() {
+        var y int
+        var ptr *int = &y
+
+        *ptr = 0
+        fmt.Println(y)
+
+        *ptr += 5
+        fmt.Println(y)
+
+}
+==> 0
+5
+
+What would be the output of the following program:
+
+
+Note: add package and import statements as needed
+
+
+func main() {
+        var y int
+        var ptr *int = &y
+        fmt.Println(y)
+        fmt.Println(*ptr)
+}
+
+
+
+A.
+
+0
+<nil>
+
+
+
+B.
+
+0
+0
+
+
+
+C.
+
+<nil>
+<nil>
+
+
+
+D.
+
+<nil>
+0
+==> B
+
+What would be the output of the following program:
+
+
+Note: add package and import statements as needed
+
+func main() {
+        s := 100
+        var ptr *string = &s
+        fmt.Println(s)
+        *ptr += 100
+        fmt.Println(s)
+}
+==> error
+
+What would be the output of the following program:
+
+
+Note: add package and import statements as needed
+
+func main() {
+        s := "hello"
+        var ptr *string = &s
+        fmt.Println(s)
+        *ptr += strings.ToUpper(s)
+        fmt.Println(s)
+}
+==> hello
+helloHELLO
+
+
+
+
+
+
+
+
+
