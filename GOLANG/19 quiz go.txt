@@ -1,0 +1,86 @@
+Define a function with following specs, and choose the correct definition
+
+- name of the function: `returnCube`
+- input parameters: `int`
+- output parameters: `int`
+
+the function calculates the cube of the number and returns it.
+
+(cube of n = n*n*n)
+==> func returnCube(n int) int {
+return n*n*n
+}
+
+What would be the output of the following program: (add package declarations and import statements as needed)
+
+func returnCube(n int) int {
+        return n*n*n
+}
+
+func main() {
+        returnCube(5)
+}
+==> no output
+
+Select valid function declaration(s) from the below options.
+
+
+A.
+
+func 3doSomething(n int) int
+
+
+
+B.
+
+func doSomething(a int, b int) int
+
+
+
+C.
+
+func doSomething(n int) int
+
+
+
+D.
+
+func do Something(n int) int
+==> B,C
+
+Choose the correct function declaration of function printDetails so the following code can be executed successfully in main function.
+
+
+var s string
+s = printDetails("Joe")
+fmt.Print(s)
+
+
+
+and gives the following output:
+
+
+Joe
+1
+==> func printDetails(s string)string
+
+What would be the output of the following program
+
+func printDetails(s string) {
+        fmt.Println(s)
+}
+
+func main() {
+        x := printDetails("Joe")
+        fmt.Print(x)
+}
+==> error
+
+
+
+
+
+
+
+
+
