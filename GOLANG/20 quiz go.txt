@@ -1,0 +1,80 @@
+What would be the output of the following program:
+
+func doSomething(int, int) int {
+        return "2"
+}
+
+func main() {
+        fmt.Println(doSomething(1, 2))
+}
+==> error
+
+What would be the output of the following program:
+
+func calcSquare(numbers []int) []int {
+        squares := []int{}
+        for _, v := range numbers {
+                squares = append(squares, v*v)
+        }
+        return squares
+
+}
+
+func main() {
+        nums := [3]int{10, 20, 15}
+        fmt.Println(calcSquare(nums[:]))
+}
+==> [100 400 225]
+
+What would be the output of the following program:
+
+func calcSquare(numbers []int) ([]int, bool) {
+        squares := []int{}
+        for _, v := range numbers {
+                squares = append(squares, v*v)
+        }
+        return squares, true
+
+}
+
+func main() {
+        nums := [3]int{10, 20, 15}
+        fmt.Println(calcSquare(nums[:]))
+}
+==> [100 400 225] true
+
+What would be the output of the following program:
+
+func printStrings(s string, names ...string) {
+        fmt.Println(s)
+        for _, value := range names {
+                fmt.Printf("%s, ", value)
+        }
+
+}
+
+func main() {
+        printStrings("Hey there", "Joe", "Monica", "Gunther")
+}
+==> Hey there
+Joe
+Monica
+Gunther
+
+What would be the output of the following program:
+
+func printStrings(names ...string) (names_c []string) {
+    names_c := []string {}
+        for _, value := range names {
+                names_c = append(names_c, strings.ToUpper(value))
+        }
+        return
+}
+
+func main() {
+        result := printStrings("Joe", "Monica", "Gunther")
+        fmt.Println(result)
+}
+==> Error
+
+
