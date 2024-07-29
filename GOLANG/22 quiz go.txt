@@ -1,0 +1,100 @@
+Select the correct way(s) of defining an anonymous function
+
+
+A.
+
+var my_func := (func(s string) {fmt.Println("Hey there,", s)})
+
+
+
+B.
+
+var (my_func = func(s string) {fmt.Println("Hey there,", s)})
+
+
+
+C.
+
+func main() {
+        var (
+                my_func = func(s string) { fmt.Println("Hey there,", s) }
+        )
+        my_func("Joe")
+}
+
+
+
+D.
+
+var my_func func := (func(s string) {fmt.Println("Hey there,", s)})
+==> B,C
+
+What would be the output of the following program:
+
+package main
+
+import (
+        "fmt"
+        "strings"
+)
+
+func main() {
+        x := func(s string) string {
+                return strings.ToUpper(s)
+        }
+        fmt.Printf("%T \n", x)
+        fmt.Println(x("Joe"))
+}
+==> func(string string
+JOE
+
+What would be the output of the following program:
+
+package main
+
+import (
+        "fmt"
+        "strings"
+)
+
+func main() {
+        x := func(s string) {
+                fmt.Println(strings.ToLower(s))
+        }
+        fmt.Printf("%T \n", x)
+        x("RacheL")
+}
+==> func(string
+rachel
+
+What would be the output of the following program:
+
+package main
+
+import (
+        "fmt"
+        "strings"
+)
+
+func main() {
+        x := func(s string) {
+                fmt.Println(strings.ToLower(s))
+        }("RacheL")
+        fmt.Printf("%T \n", x)
+}
+==> Error
+
+What would be the output of the following program: (add package and import statements as needed)
+
+var (
+        cube = func(i int) string {
+                c := i * i * i
+                return strconv.Itoa(c)
+        }
+)
+
+func main() {
+        x := cube(8)
+        fmt.Printf("%T %v", x, x)
+}
+==> string 512
