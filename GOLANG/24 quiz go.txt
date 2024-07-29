@@ -1,0 +1,157 @@
+Select the correct statement(s) for defer statement.
+
+
+A. defer statement delays the execution of a function until the previous function returns.
+
+
+B. defer statement delays the execution of a function until the following function returns.
+
+
+C. defer statement delays the execution of a surrounding function until the current function returns.
+
+
+D. defer statement delays the execution of a function until the surrounding function returns.
+==> D
+
+What would be the output of the following program?
+
+package main
+
+import "fmt"
+
+func printString(str string){
+        fmt.Printf("%q ", str)
+}
+
+func printInt(i int){
+        fmt.Printf("%d ", i)
+}
+
+func printFloat(f float64){
+        fmt.Printf("%.2f ", f)
+}
+func main() {
+        printString("browser")
+        defer printInt(32)
+        defer printFloat(0.24)
+        printString("chrome")
+        printInt(90)
+        defer printFloat(89)
+        printInt(900)
+}
+==> "browser"  "chrome" 90 900 89.00 0.24 32
+
+What would be the output of the following program?
+
+package main
+
+import (
+        "fmt"
+        "strings"
+)
+
+func getString(str string) (string, string) {
+        return strings.ToLower(str), strings.ToUpper(str)
+}
+
+func main() {
+        _, lower := getString("BROWSER")
+        fmt.Println(lower)
+}
+==> BROWSER
+
+Make the required changes in the function body:
+
+
+func greetings() (x, y string) {
+        x := "hello "
+        y := "world"
+}
+
+func main() {
+        fmt.Print(greetings())
+}
+so the output is hello world
+
+
+Select the correct definition(s) -
+
+A.
+
+func greetings() (x, y string) {
+        x := "hello "
+        y := "world"
+    return x, y
+}
+
+
+
+B.
+
+func greetings() (x, y string) {
+        x = "hello "
+        y = "world"
+        return x, y
+}
+
+
+
+C.
+
+func greetings() (x, y string) {
+        x = "hello "
+        y = "world"
+        return
+}
+
+
+
+D.
+
+func greetings() (x, y string) {
+        x := "hello "
+        y := "world"
+    return "hello world"
+}
+==> B,C
+
+What would be the output of the following program?
+
+package main
+
+import (
+        "fmt"
+)
+
+func main() {
+        fmt.Println(f1())
+}
+
+func f1() int {
+        return f2()
+}
+
+func f2() int {
+        return 1
+}
+==> 1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
