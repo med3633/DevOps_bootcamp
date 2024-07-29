@@ -1,0 +1,84 @@
+What would be the output of the following program:
+
+package main
+
+import "fmt"
+
+func main() {
+        arr := [5]string{"one", "two", "three"}
+        slice := arr[:3]
+        my_map := make(map[int]string)
+        for i, el := range slice {
+                my_map[i+1] = el
+        }
+        fmt.Println(my_map)
+}
+==> map[1:one 2:two 3:three]
+
+What would be the output of the following program:
+
+package main
+
+import "fmt"
+
+func main() {
+        arr := [5]int{}
+        my_map := make(map[string]int)
+        my_map["A"] = 65
+        my_map["B"] = 66
+        i := 0
+        for _, value := range my_map {
+                arr[i] = value
+                i += 1
+        }
+        fmt.Println(arr)
+}
+==> [65 66 0 0 0]
+
+What would be the output of the following program:
+
+package main
+
+import "fmt"
+
+func main() {
+        arr := [5]int{10, 20, 30, 90, 100}
+        new_slice := append(arr[:3], arr[4:]...)
+        fmt.Print(new_slice)
+}
+==> [10, 20, 30, 100]
+
+What would be the output of the following program:
+
+package main
+
+import "fmt"
+
+func main() {
+        my_map := make([int]int)
+        my_map[2] = 4
+        my_map[4] = 16
+        my_map[8] = 64
+        delete(my_map, 4)
+        fmt.Print(my_map)
+}
+==> Error
+
+What would be the output of the following program:
+
+package main
+
+import "fmt"
+
+func main() {
+        arr := [10]string{"a", "b", "c"}
+        hashmap := make(map[string]int)
+        my_slice := arr[:]
+        fmt.Println(len(my_slice))
+        fmt.Println(cap(my_slice))
+        fmt.Println(len(hashmap))
+}
+==> 10
+10
+0
+
