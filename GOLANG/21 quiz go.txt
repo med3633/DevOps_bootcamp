@@ -1,0 +1,93 @@
+What is the most appropriate definition for recursion?
+
+
+A. A function that calls another function.
+
+
+B. A function that calls another execution instance of the same function.
+
+
+C. An in-built method for solving base cases related problems.
+
+
+D. A variadic function that calls another variadic function.
+==> B
+
+Complete the missing line (to calculate the factorial of a number):
+
+func fact(n int) int {
+        if n == 0 {
+                return 1
+        }
+        return ______
+
+}
+==> n*fact(n-1)
+
+What would be the output of the following program:
+
+func print(n int) {
+        if n == 0 {
+                return
+        }
+        fmt.Print(n)
+        print(n - 1)
+
+}
+
+func main() {
+        print(5)
+}
+==> 54321
+
+What would be the output of the following program:
+
+func print(n int) {
+        if n == 0 {
+                return
+        }
+        print(n - 1)
+        fmt.Print(n)
+
+}
+
+func main() {
+        print(5)
+}
+==> 12345
+
+Select the correct base case for function printSquares -
+
+
+for input n -> prints squares for n, n-1, n-2, …… -5
+
+
+Example: Input: n=2 Output: 4, 1, 0, 1, 4, 9, 16, 25
+
+func print(n int) {
+        // base case
+        fmt.Printf("%d ", n*n)
+        print(n - 1)
+}
+
+func main() {
+        print(2)
+}
+==> if n == -6 {
+return 
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
