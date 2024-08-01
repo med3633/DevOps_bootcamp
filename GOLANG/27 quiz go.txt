@@ -1,0 +1,169 @@
+What would be the output of the following program?
+
+
+Note: add package and import statements as needed
+
+type Movie struct {
+        name   string
+        rating float32
+}
+
+func main() {
+        m := Movie{name: "ABCD"}
+        var m2 Movie
+        fmt.Printf("%+v", m)
+        fmt.Printf("%+v", m2)
+}
+==> {name:ABCD rating:0}{name: rating:0}
+
+What would be the output of the following program?
+
+
+Note: add package and import statements as needed
+
+type Movie struct {
+        name   string
+        rating float32
+}
+
+func getMovie(s string, r float32) (m Movie) {
+        m = Movie{
+                name:   s,
+                rating: r,
+        }
+        return
+}
+
+func main() {
+        fmt.Printf("%+v", getMovie("xyz", 3.5))
+}
+==> {name:xyz rating:3.5}
+
+What would be the output of the following program?
+
+
+Note: add package and import statements as needed.
+
+type Movie struct {
+        name   string
+        rating float32
+}
+
+func getMovie(s string, r float32) (m Movie) {
+        m = Movie{
+                name:   s,
+                rating: r,
+        }
+        return
+}
+
+func increaseRating(m *Movie) {
+        m.rating += 1.0
+}
+
+func main() {
+        mov := getMovie("xyz", 2.0)
+        increaseRating(mov)
+        fmt.Printf("%+v", mov)
+}
+==> error
+
+What would be the output of the following program?
+
+
+Note: add package and import statements as needed.
+
+type Movie struct {
+        name   string
+        rating float32
+}
+
+func getMovie(s string, r float32) (m Movie) {
+        m = Movie{
+                name:   s,
+                rating: r,
+        }
+        return
+}
+
+func main() {
+        mov := getMovie("xyz", 2.0)
+        fmt.Println(mov.name)
+        fmt.Println(mov.ratings)
+}
+==> error
+
+What would be the output of the following program?
+
+
+Note: add package and import statements as needed.
+
+type Movie struct {
+        name   string
+        rating float32
+}
+
+func getMovie(s string, r float32) (m Movie) {
+        m = Movie{
+                name:   s,
+                rating: r,
+        }
+        return
+}
+
+func main() {
+        mov := getMovie("xyz", 2.1)
+        mov1 := getMovie("abc", 3.3)
+        movies := make([]Movie, 5)
+        movies = append(movies, mov)
+        movies = append(movies, mov1)
+        for _, value := range movies {
+                fmt.Println(value)
+        }
+}
+==>  {0}
+{0}
+{0}
+{0}
+{0}
+{xyz", 2.1}
+{"abc", 3.3}
+
+What would be the output of the following program?
+
+
+Note: add package and import statements as needed.
+
+type Movie struct {
+        name   string
+        rating float32
+}
+
+func main() {
+        mov := Movie{"xyz", 2.1}
+        mov1 := Movie{"abc", 2.1}
+        if mov.rating == mov1.rating || mov != mov1 {
+                fmt.Println("condition met")
+        } else if mov.rating == mov1.rating {
+                fmt.Println("condition_2 met")
+        }
+}
+==> condition met
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
